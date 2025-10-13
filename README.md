@@ -215,6 +215,75 @@ GET /api/csv-upload/template
 Authorization: Bearer <token>
 ```
 
+### Daily Training Talk
+
+#### Create Daily Training
+
+```
+POST /api/daily-training
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "projectId": "P123",
+  "date": "2024-01-15",
+  "topic": "PPE Usage and Safety",
+  "duration": 30,
+  "trainer": "John Smith",
+  "attendeesCount": 15,
+  "keyPoints": [
+    "Proper helmet fitting and inspection",
+    "Safety harness usage guidelines",
+    "Emergency procedures review"
+  ],
+  "photos": ["https://cloudinary.com/image1.jpg"]
+}
+```
+
+#### Get All Daily Training Records
+
+```
+GET /api/daily-training?page=1&limit=10&topic=PPE&trainer=John&status=completed
+Authorization: Bearer <token>
+```
+
+#### Get Single Daily Training Record
+
+```
+GET /api/daily-training/:id
+Authorization: Bearer <token>
+```
+
+#### Update Daily Training Record
+
+```
+PUT /api/daily-training/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "keyPoints": [
+    "Updated key point 1",
+    "Updated key point 2"
+  ]
+}
+```
+
+#### Get Daily Training Statistics
+
+```
+GET /api/daily-training/stats/overview?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Popular Training Topics
+
+```
+GET /api/daily-training/topics/popular?projectId=P123&limit=10
+Authorization: Bearer <token>
+```
+
 ### Safety Observations
 
 #### Create Safety Observation
