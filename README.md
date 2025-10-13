@@ -1,0 +1,345 @@
+# HSE Management Backend
+
+A comprehensive backend API for Health, Safety, and Environment (HSE) management system built with Node.js, Express, and MongoDB.
+
+## Features
+
+- **Safety Observations**: Create, read, update, and delete safety observations
+- **Image Upload**: Cloudinary integration for photo and signature uploads
+- **User Authentication**: JWT-based authentication with role-based access control
+- **Data Validation**: Comprehensive input validation and error handling
+- **Statistics**: Safety observation analytics and reporting
+
+## Tech Stack
+
+- Node.js & Express.js
+- MongoDB with Mongoose
+- JWT Authentication
+- Cloudinary for image storage
+- Express Validator for input validation
+- Multer for file uploads
+
+## Setup Instructions
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. Environment Configuration
+
+Copy the example environment file and configure your variables:
+
+```bash
+cp env.example .env
+```
+
+Update the `.env` file with your configuration:
+
+```env
+# Database
+MONGODB_URI=mongodb://localhost:27017/hse_management
+
+# JWT
+JWT_SECRET=your_jwt_secret_key_here
+JWT_EXPIRE=7d
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
+# Server
+PORT=5000
+NODE_ENV=development
+```
+
+### 3. Cloudinary Setup
+
+1. Create a Cloudinary account at [cloudinary.com](https://cloudinary.com)
+2. Get your cloud name, API key, and API secret from the dashboard
+3. Update the `.env` file with your Cloudinary credentials
+
+### 4. Start the Server
+
+```bash
+# Development
+npm run dev
+
+# Production
+npm start
+```
+
+## API Endpoints
+
+### Authentication
+
+#### Register User
+
+```
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "employeeId": "EMP001",
+  "role": "employee",
+  "department": "Safety",
+  "phone": "+1234567890"
+}
+```
+
+#### Login
+
+```
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+#### Get Current User
+
+```
+GET /api/auth/me
+Authorization: Bearer <token>
+```
+
+### Safety Observations
+
+#### Create Safety Observation
+
+```
+POST /api/safety-observations
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "projectId": "P123",
+  "type": "unsafe_act",
+  "dateTime": "2024-01-15T10:30:00Z",
+  "location": "Zone A - Crane 3",
+  "observedBy": "John Smith (EMP345)",
+  "observedPerson": "Mike Johnson",
+  "severity": "High",
+  "description": "Worker not wearing safety helmet while operating crane",
+  "correctiveAction": "Immediate stop work, provide safety helmet",
+  "actionOwner": "site_incharge",
+  "targetClosureDate": "2024-01-20",
+  "photos": ["https://cloudinary.com/image1.jpg"],
+  "signature": "data:image/png;base64,..."
+}
+```
+
+#### Get All Safety Observations
+
+```
+GET /api/safety-observations?page=1&limit=10&severity=High&status=open
+Authorization: Bearer <token>
+```
+
+#### Get Single Safety Observation
+
+```
+GET /api/safety-observations/:id
+Authorization: Bearer <token>
+```
+
+#### Update Safety Observation
+
+```
+PUT /api/safety-observations/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "in_progress",
+  "assignedTo": "Safety Manager",
+  "closureNotes": "Action taken and verified"
+}
+```
+
+#### Get Safety Statistics
+
+```
+GET /api/safety-observations/stats/overview?projectId=P123
+Authorization: Bearer <token>
+```
+
+### File Upload
+
+#### Upload Single Image
+
+```
+POST /api/upload/image
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+FormData: image (file)
+```
+
+#### Upload Multiple Images
+
+```
+POST /api/upload/images
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+FormData: images (files, max 6)
+```
+
+#### Upload Signature
+
+```
+POST /api/upload/signature
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+FormData: signature (file)
+```
+
+#### Delete Image
+
+```
+DELETE /api/upload/:publicId
+Authorization: Bearer <token>
+```
+
+## Data Models
+
+### Safety Observation Schema
+
+```javascript
+{
+  projectId: String (required),
+  type: String (enum: ['unsafe_act', 'unsafe_condition']),
+  dateTime: Date (required),
+  location: String (required),
+  observedBy: String (required),
+  observedPerson: String,
+  severity: String (enum: ['Low', 'Medium', 'High', 'Critical']),
+  description: String (required, min 10 chars),
+  correctiveAction: String,
+  actionOwner: String (enum: ['site_incharge', 'contractor_rep', 'other']),
+  targetClosureDate: Date,
+  photos: [String], // Cloudinary URLs (max 6),
+  signature: String, // Base64 or Cloudinary URL
+  status: String (enum: ['open', 'in_progress', 'closed', 'cancelled']),
+  assignedTo: String,
+  closureDate: Date,
+  closureNotes: String,
+  createdBy: ObjectId,
+  updatedBy: ObjectId,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### User Schema
+
+```javascript
+{
+  name: String (required),
+  email: String (required, unique),
+  password: String (required, min 6 chars),
+  employeeId: String (required, unique),
+  role: String (enum: ['admin', 'manager', 'supervisor', 'employee', 'contractor']),
+  department: String,
+  phone: String,
+  isActive: Boolean (default: true),
+  lastLogin: Date,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+## Validation Rules
+
+### Safety Observation Validation
+
+- **Required fields**: projectId, type, dateTime, location, observedBy, severity, description, actionOwner
+- **Description**: Minimum 10 characters
+- **Corrective Action**: Required for Medium/High/Critical severity
+- **Photos**: Maximum 6 images
+- **Target Closure Date**: Must be in the future
+
+### File Upload Validation
+
+- **File Types**: Only image files allowed
+- **File Size**: Maximum 10MB per file
+- **Multiple Images**: Maximum 6 files per request
+- **Image Processing**: Automatic resizing and optimization via Cloudinary
+
+## Error Handling
+
+The API returns consistent error responses:
+
+```javascript
+{
+  "message": "Error description",
+  "errors": [ // For validation errors
+    {
+      "field": "fieldName",
+      "msg": "Error message"
+    }
+  ]
+}
+```
+
+## Security Features
+
+- JWT-based authentication
+- Password hashing with bcrypt
+- Rate limiting (100 requests per 15 minutes)
+- Helmet.js for security headers
+- Input validation and sanitization
+- File type and size restrictions
+
+## Development
+
+### Scripts
+
+```bash
+npm run dev    # Start development server with nodemon
+npm start      # Start production server
+npm test       # Run tests
+```
+
+### Project Structure
+
+```
+backend/
+├── config/
+│   └── cloudinary.js
+├── middleware/
+│   └── auth.js
+├── models/
+│   ├── SafetyObservation.js
+│   └── User.js
+├── routes/
+│   ├── auth.js
+│   ├── safetyObservations.js
+│   └── upload.js
+├── server.js
+├── package.json
+└── README.md
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+MIT License
+
