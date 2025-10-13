@@ -835,6 +835,113 @@ GET /api/dangerous-occurrence/regulatory/pending?projectId=P123
 Authorization: Bearer <token>
 ```
 
+### SIC Meeting
+
+#### Create SIC Meeting
+
+```
+POST /api/sic-meeting
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "projectId": "P123",
+  "meetingDateTime": "2024-01-15T09:00:00Z",
+  "attendees": [
+    {
+      "name": "John Smith",
+      "empId": "EMP001",
+      "contractor": "ABC Construction Ltd"
+    },
+    {
+      "name": "Jane Doe",
+      "empId": "EMP002",
+      "contractor": "XYZ Builders"
+    }
+  ],
+  "agendaPoints": [
+    "Safety performance review",
+    "Upcoming work activities",
+    "Equipment maintenance schedule",
+    "Weather conditions and precautions"
+  ],
+  "decisions": "1. Implement additional safety measures for high-risk activities\n2. Schedule equipment inspection for next week\n3. Conduct safety briefing before each shift",
+  "actionOwners": "Safety Manager - Equipment inspection\nSupervisor - Safety briefings\nForeman - Implementation of safety measures",
+  "photos": ["https://cloudinary.com/image1.jpg"],
+  "sicSignature": "data:image/png;base64,...",
+  "meetingType": "daily",
+  "location": "Site Office",
+  "meetingDuration": 45,
+  "followUpRequired": true,
+  "nextMeetingDate": "2024-01-16T09:00:00Z",
+  "followUpNotes": "Review implementation of safety measures"
+}
+```
+
+#### Get All SIC Meetings
+
+```
+GET /api/sic-meeting?page=1&limit=10&meetingType=daily&status=completed&projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Single SIC Meeting
+
+```
+GET /api/sic-meeting/:id
+Authorization: Bearer <token>
+```
+
+#### Update SIC Meeting
+
+```
+PUT /api/sic-meeting/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "meetingDuration": 60,
+  "followUpRequired": true,
+  "nextMeetingDate": "2024-01-16T09:00:00Z",
+  "followUpNotes": "Follow up on safety measures implementation"
+}
+```
+
+#### Get SIC Meeting Statistics
+
+```
+GET /api/sic-meeting/stats/overview?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Pending Action Items
+
+```
+GET /api/sic-meeting/action-items/pending?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Overdue Action Items
+
+```
+GET /api/sic-meeting/action-items/overdue?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Update Action Item Status
+
+```
+PUT /api/sic-meeting/:id/action-item/:actionItemId
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "notes": "Safety measures implemented successfully"
+}
+```
+
 ### Safety Observations
 
 #### Create Safety Observation
