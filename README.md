@@ -584,6 +584,82 @@ GET /api/stop-work-order/reasons/categories?projectId=P123
 Authorization: Bearer <token>
 ```
 
+### First-Aid Case
+
+#### Create First-Aid Case
+
+```
+POST /api/first-aid
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "projectId": "P123",
+  "dateTime": "2024-01-15T14:30:00Z",
+  "victimName": "John Smith",
+  "victimEmpId": "EMP123",
+  "injuryType": "Cut on hand",
+  "cause": "Slipped while carrying materials and cut hand on sharp edge",
+  "treatmentGiven": "Cleaned wound with antiseptic, applied bandage, advised to see doctor if signs of infection",
+  "transportToHospital": false,
+  "hospitalName": "",
+  "hospitalDetails": "",
+  "witnessNames": ["Mike Johnson", "Sarah Wilson"],
+  "photos": ["https://cloudinary.com/image1.jpg"]
+}
+```
+
+#### Get All First-Aid Cases
+
+```
+GET /api/first-aid?page=1&limit=10&injuryType=Cut&status=reported&transportToHospital=false&victimEmpId=EMP123
+Authorization: Bearer <token>
+```
+
+#### Get Single First-Aid Case
+
+```
+GET /api/first-aid/:id
+Authorization: Bearer <token>
+```
+
+#### Update First-Aid Case
+
+```
+PUT /api/first-aid/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "investigated",
+  "investigationNotes": "Incident investigated, additional safety measures implemented",
+  "followUpRequired": true,
+  "followUpDate": "2024-01-20",
+  "followUpNotes": "Check victim's recovery status"
+}
+```
+
+#### Get First-Aid Statistics
+
+```
+GET /api/first-aid/stats/overview?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Popular Injury Types
+
+```
+GET /api/first-aid/injury-types/popular?projectId=P123&limit=10
+Authorization: Bearer <token>
+```
+
+#### Get Due Follow-ups
+
+```
+GET /api/first-aid/follow-up/due?projectId=P123
+Authorization: Bearer <token>
+```
+
 ### Safety Observations
 
 #### Create Safety Observation
