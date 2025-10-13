@@ -433,6 +433,84 @@ GET /api/special-training/certifications/summary?projectId=P123
 Authorization: Bearer <token>
 ```
 
+### Safety Advisory Warning
+
+#### Create Safety Advisory Warning
+
+```
+POST /api/safety-advisory-warning
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "projectId": "P123",
+  "date": "2024-01-15",
+  "warningTitle": "High Winds Expected - Crane Operations Suspended",
+  "severity": "high",
+  "affectedArea": "Zone A, All crane operations",
+  "description": "Weather forecast indicates high winds exceeding 40 mph expected from 2 PM to 6 PM today. All crane operations must be suspended during this period.",
+  "validityFrom": "2024-01-15",
+  "validityTo": "2024-01-15",
+  "actionsRequired": "1. Secure all crane loads immediately\n2. Lower crane booms to safe position\n3. Notify all crane operators\n4. Resume operations only after wind speed drops below 25 mph",
+  "owner": "Site Safety Manager",
+  "photos": ["https://cloudinary.com/image1.jpg"]
+}
+```
+
+#### Get All Safety Advisory Warnings
+
+```
+GET /api/safety-advisory-warning?page=1&limit=10&severity=high&status=active&affectedArea=Zone
+Authorization: Bearer <token>
+```
+
+#### Get Single Safety Advisory Warning
+
+```
+GET /api/safety-advisory-warning/:id
+Authorization: Bearer <token>
+```
+
+#### Update Safety Advisory Warning
+
+```
+PUT /api/safety-advisory-warning/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "resolved",
+  "severity": "medium",
+  "validityTo": "2024-01-16"
+}
+```
+
+#### Acknowledge Safety Advisory Warning
+
+```
+POST /api/safety-advisory-warning/:id/acknowledge
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "notes": "Acknowledged and actions taken"
+}
+```
+
+#### Get Safety Advisory Warning Statistics
+
+```
+GET /api/safety-advisory-warning/stats/overview?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Currently Active Warnings
+
+```
+GET /api/safety-advisory-warning/active/current?projectId=P123
+Authorization: Bearer <token>
+```
+
 ### Safety Observations
 
 #### Create Safety Observation

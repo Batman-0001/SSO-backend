@@ -42,6 +42,10 @@ app.use("/api/induction-training", require("./routes/inductionTraining"));
 app.use("/api/daily-training", require("./routes/dailyTraining"));
 app.use("/api/pep-talk", require("./routes/pepTalk"));
 app.use("/api/special-training", require("./routes/specialTraining"));
+app.use(
+  "/api/safety-advisory-warning",
+  require("./routes/safetyAdvisoryWarning")
+);
 app.use("/api/upload", require("./routes/upload"));
 app.use("/api/csv-upload", require("./routes/csvUpload"));
 
