@@ -1,7 +1,7 @@
 const express = require("express");
 const { body, validationResult } = require("express-validator");
 const SpecialTraining = require("../models/SpecialTraining");
-const auth = require("../middleware/auth");
+const { auth } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -286,11 +286,9 @@ router.delete("/:id", auth, async (req, res) => {
       req.user.role !== "admin" &&
       training.createdBy.toString() !== req.user.id
     ) {
-      return res
-        .status(403)
-        .json({
-          message: "Not authorized to delete this special training record",
-        });
+      return res.status(403).json({
+        message: "Not authorized to delete this special training record",
+      });
     }
 
     await SpecialTraining.findByIdAndDelete(req.params.id);

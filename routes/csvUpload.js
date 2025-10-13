@@ -2,7 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const csv = require("csv-parser");
 const { Readable } = require("stream");
-const auth = require("../middleware/auth");
+const { auth } = require("../middleware/auth");
 
 const router = express.Router();
 

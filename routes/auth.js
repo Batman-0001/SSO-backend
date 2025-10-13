@@ -2,7 +2,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 const User = require("../models/User");
-const auth = require("../middleware/auth");
+const { auth } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -12,17 +12,15 @@ const router = express.Router();
 router.post(
   "/register",
   [
-    [
-      body("name").notEmpty().withMessage("Name is required"),
-      body("email").isEmail().withMessage("Valid email is required"),
-      body("password")
-        .isLength({ min: 6 })
-        .withMessage("Password must be at least 6 characters"),
-      body("employeeId").notEmpty().withMessage("Employee ID is required"),
-      body("role")
-        .optional()
-        .isIn(["admin", "manager", "supervisor", "employee", "contractor"]),
-    ],
+    body("name").notEmpty().withMessage("Name is required"),
+    body("email").isEmail().withMessage("Valid email is required"),
+    body("password")
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters"),
+    body("employeeId").notEmpty().withMessage("Employee ID is required"),
+    body("role")
+      .optional()
+      .isIn(["admin", "manager", "supervisor", "employee", "contractor"]),
   ],
   async (req, res) => {
     try {
@@ -101,10 +99,8 @@ router.post(
 router.post(
   "/login",
   [
-    [
-      body("email").isEmail().withMessage("Valid email is required"),
-      body("password").notEmpty().withMessage("Password is required"),
-    ],
+    body("email").isEmail().withMessage("Valid email is required"),
+    body("password").notEmpty().withMessage("Password is required"),
   ],
   async (req, res) => {
     try {
@@ -191,14 +187,12 @@ router.put(
   "/profile",
   [
     auth,
-    [
-      body("name").optional().notEmpty().withMessage("Name cannot be empty"),
-      body("phone").optional().notEmpty().withMessage("Phone cannot be empty"),
-      body("department")
-        .optional()
-        .notEmpty()
-        .withMessage("Department cannot be empty"),
-    ],
+    body("name").optional().notEmpty().withMessage("Name cannot be empty"),
+    body("phone").optional().notEmpty().withMessage("Phone cannot be empty"),
+    body("department")
+      .optional()
+      .notEmpty()
+      .withMessage("Department cannot be empty"),
   ],
   async (req, res) => {
     try {
@@ -237,14 +231,12 @@ router.post(
   "/change-password",
   [
     auth,
-    [
-      body("currentPassword")
-        .notEmpty()
-        .withMessage("Current password is required"),
-      body("newPassword")
-        .isLength({ min: 6 })
-        .withMessage("New password must be at least 6 characters"),
-    ],
+    body("currentPassword")
+      .notEmpty()
+      .withMessage("Current password is required"),
+    body("newPassword")
+      .isLength({ min: 6 })
+      .withMessage("New password must be at least 6 characters"),
   ],
   async (req, res) => {
     try {

@@ -1,0 +1,1030 @@
+{
+  "info": {
+    "name": "HSE Management API",
+    "description": "Complete HSE (Health, Safety, Environment) Management System API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "projectId",
+      "value": "P123",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"employeeId\": \"EMP001\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Safety Observations",
+      "item": [
+        {
+          "name": "Create Safety Observation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"type\": \"unsafe_act\",\n  \"dateTime\": \"2024-01-15T10:30:00Z\",\n  \"location\": \"Zone A - Crane 3\",\n  \"observedBy\": \"John Smith (EMP345)\",\n  \"observedPerson\": \"Mike Johnson (EMP456)\",\n  \"severity\": \"Medium\",\n  \"description\": \"Worker not wearing safety harness while working at height\",\n  \"correctiveAction\": \"Immediate stop work, provide proper PPE, conduct safety briefing\",\n  \"actionOwner\": \"site_incharge\",\n  \"targetClosureDate\": \"2024-12-31\",\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"],\n  \"signature\": \"data:image/png;base64,...\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/safety-observations",
+              "host": ["{{baseUrl}}"],
+              "path": ["safety-observations"]
+            }
+          }
+        },
+        {
+          "name": "Get All Safety Observations",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/safety-observations?page=1&limit=10&projectId={{projectId}}&severity=Medium",
+              "host": ["{{baseUrl}}"],
+              "path": ["safety-observations"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                },
+                {
+                  "key": "severity",
+                  "value": "Medium"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Safety Observation by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/safety-observations/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["safety-observations", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Update Safety Observation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"closed\",\n  \"correctiveAction\": \"Updated corrective action with additional safety measures\",\n  \"actionCompleted\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/safety-observations/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["safety-observations", ":id"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Induction Training",
+      "item": [
+        {
+          "name": "Create Induction Training",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"date\": \"2024-01-15\",\n  \"topic\": \"Site Safety Induction\",\n  \"duration\": 120,\n  \"trainer\": \"Safety Manager\",\n  \"attendees\": [\n    {\n      \"name\": \"John Smith\",\n      \"empId\": \"EMP001\",\n      \"contractor\": \"ABC Construction Ltd\"\n    },\n    {\n      \"name\": \"Jane Doe\",\n      \"empId\": \"EMP002\",\n      \"contractor\": \"XYZ Builders\"\n    }\n  ],\n  \"notes\": \"Comprehensive safety induction covering all site hazards\",\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/induction-training",
+              "host": ["{{baseUrl}}"],
+              "path": ["induction-training"]
+            }
+          }
+        },
+        {
+          "name": "Get All Induction Training",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/induction-training?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["induction-training"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Induction Training Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/induction-training/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["induction-training", "stats", "overview"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "CSV Upload",
+      "item": [
+        {
+          "name": "Upload Attendees CSV",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "sample_attendees.csv"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/csv-upload/attendees",
+              "host": ["{{baseUrl}}"],
+              "path": ["csv-upload", "attendees"]
+            }
+          }
+        },
+        {
+          "name": "Download CSV Template",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/csv-upload/template",
+              "host": ["{{baseUrl}}"],
+              "path": ["csv-upload", "template"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Daily Training Talk",
+      "item": [
+        {
+          "name": "Create Daily Training Talk",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"date\": \"2024-01-15\",\n  \"topic\": \"Fall Protection\",\n  \"duration\": 30,\n  \"trainer\": \"Safety Supervisor\",\n  \"attendeesCount\": 25,\n  \"keyPoints\": [\n    \"Proper harness inspection\",\n    \"Anchor point selection\",\n    \"Fall arrest vs fall restraint\",\n    \"Emergency procedures\"\n  ],\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/daily-training",
+              "host": ["{{baseUrl}}"],
+              "path": ["daily-training"]
+            }
+          }
+        },
+        {
+          "name": "Get Daily Training Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/daily-training/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["daily-training", "stats", "overview"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Popular Topics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/daily-training/topics/popular?projectId={{projectId}}&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["daily-training", "topics", "popular"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PEP Talk",
+      "item": [
+        {
+          "name": "Create PEP Talk",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"date\": \"2024-01-15\",\n  \"topic\": \"Environmental Protection\",\n  \"duration\": 45,\n  \"trainer\": \"Environmental Officer\",\n  \"attendeesCount\": 30,\n  \"keyPoints\": [\n    \"Waste management procedures\",\n    \"Spill prevention and response\",\n    \"Environmental monitoring\",\n    \"Regulatory compliance\"\n  ],\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pep-talk",
+              "host": ["{{baseUrl}}"],
+              "path": ["pep-talk"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Special Technical Training",
+      "item": [
+        {
+          "name": "Create Special Training",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"date\": \"2024-01-15\",\n  \"topic\": \"Crane Operation Certification\",\n  \"duration\": 480,\n  \"trainer\": \"Certified Crane Instructor\",\n  \"attendeesCount\": 8,\n  \"keyPoints\": [\n    \"Crane load calculations\",\n    \"Safety procedures\",\n    \"Emergency protocols\",\n    \"Maintenance requirements\"\n  ],\n  \"certificationsIssued\": true,\n  \"permitRequired\": true,\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/special-training",
+              "host": ["{{baseUrl}}"],
+              "path": ["special-training"]
+            }
+          }
+        },
+        {
+          "name": "Get Certification Summary",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/special-training/certifications/summary?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["special-training", "certifications", "summary"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Safety Advisory Warning",
+      "item": [
+        {
+          "name": "Create Safety Advisory Warning",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"date\": \"2024-01-15\",\n  \"warningTitle\": \"High Wind Conditions Alert\",\n  \"severity\": \"high\",\n  \"affectedArea\": \"All elevated work areas\",\n  \"description\": \"Wind speeds exceeding 25 mph detected. All work at height must be suspended immediately.\",\n  \"validityFrom\": \"2024-01-15T08:00:00Z\",\n  \"validityTo\": \"2024-01-16T18:00:00Z\",\n  \"actionsRequired\": \"1. Suspend all work at height\\n2. Secure all loose materials\\n3. Monitor weather conditions\\n4. Resume work only after wind speeds drop below 20 mph\",\n  \"owner\": \"Site Safety Manager\",\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/safety-advisory-warning",
+              "host": ["{{baseUrl}}"],
+              "path": ["safety-advisory-warning"]
+            }
+          }
+        },
+        {
+          "name": "Acknowledge Warning",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user_id_here\",\n  \"acknowledgedAt\": \"2024-01-15T09:30:00Z\",\n  \"notes\": \"Acknowledged and implemented safety measures\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/safety-advisory-warning/:id/acknowledge",
+              "host": ["{{baseUrl}}"],
+              "path": ["safety-advisory-warning", ":id", "acknowledge"]
+            }
+          }
+        },
+        {
+          "name": "Get Active Warnings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/safety-advisory-warning/active?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["safety-advisory-warning", "active"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stop Work Order",
+      "item": [
+        {
+          "name": "Create Stop Work Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"dateTime\": \"2024-01-15T14:30:00Z\",\n  \"areaStopped\": \"Zone B - Excavation Area\",\n  \"activityStopped\": \"Excavation work\",\n  \"reasonCategory\": \"unsafe_condition\",\n  \"reasonDescription\": \"Unstable soil conditions detected, risk of trench collapse\",\n  \"issuedBy\": \"Safety Inspector (EMP789)\",\n  \"duration\": 4,\n  \"immediateActions\": \"1. Evacuate all personnel from excavation area\\n2. Install additional shoring\\n3. Conduct soil stability assessment\\n4. Implement enhanced safety measures\",\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"],\n  \"sicSignature\": \"data:image/png;base64,...\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/stop-work-order",
+              "host": ["{{baseUrl}}"],
+              "path": ["stop-work-order"]
+            }
+          }
+        },
+        {
+          "name": "Resolve Stop Work Order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\",\n  \"resolutionNotes\": \"Additional shoring installed, soil stability confirmed, work can resume\",\n  \"resolvedBy\": \"Site Engineer\",\n  \"resolvedAt\": \"2024-01-15T18:30:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/stop-work-order/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["stop-work-order", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Get Stop Work Order Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/stop-work-order/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["stop-work-order", "stats", "overview"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "First-Aid Case",
+      "item": [
+        {
+          "name": "Create First-Aid Case",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"dateTime\": \"2024-01-15T11:45:00Z\",\n  \"victimName\": \"John Smith\",\n  \"victimEmpId\": \"EMP123\",\n  \"victimContractor\": \"ABC Construction Ltd\",\n  \"injuryType\": \"cut\",\n  \"injuryLocation\": \"hand\",\n  \"injuryDescription\": \"Deep cut on left hand from metal edge\",\n  \"severity\": \"minor\",\n  \"treatment\": \"Cleaned wound, applied antiseptic, bandaged\",\n  \"treatedBy\": \"First Aid Officer (EMP456)\",\n  \"transportToHospital\": false,\n  \"witnessNames\": [\"Mike Johnson (EMP789)\", \"Sarah Wilson (EMP012)\"],\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/first-aid",
+              "host": ["{{baseUrl}}"],
+              "path": ["first-aid"]
+            }
+          }
+        },
+        {
+          "name": "Create First-Aid Case with Hospital Transport",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"dateTime\": \"2024-01-15T13:20:00Z\",\n  \"victimName\": \"Jane Doe\",\n  \"victimEmpId\": \"EMP456\",\n  \"victimContractor\": \"XYZ Builders\",\n  \"injuryType\": \"fall\",\n  \"injuryLocation\": \"back\",\n  \"injuryDescription\": \"Fall from ladder, back pain and possible spinal injury\",\n  \"severity\": \"serious\",\n  \"treatment\": \"Immobilized spine, called ambulance\",\n  \"treatedBy\": \"Safety Officer (EMP789)\",\n  \"transportToHospital\": true,\n  \"hospitalName\": \"City General Hospital\",\n  \"ambulanceCalled\": true,\n  \"ambulanceArrivalTime\": \"2024-01-15T13:35:00Z\",\n  \"hospitalArrivalTime\": \"2024-01-15T13:50:00Z\",\n  \"witnessNames\": [\"Tom Brown (EMP321)\"],\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/first-aid",
+              "host": ["{{baseUrl}}"],
+              "path": ["first-aid"]
+            }
+          }
+        },
+        {
+          "name": "Get First-Aid Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/first-aid/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["first-aid", "stats", "overview"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Due Follow-ups",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/first-aid/follow-ups/due?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["first-aid", "follow-ups", "due"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Near Miss",
+      "item": [
+        {
+          "name": "Create Near Miss Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"dateTime\": \"2024-01-15T15:30:00Z\",\n  \"location\": \"Zone C - Scaffolding Area\",\n  \"situation\": \"Worker almost fell from unsecured ladder while accessing upper level\",\n  \"potentialConsequence\": \"Serious injury or fatality from fall from height\",\n  \"preventiveActions\": \"1. Ensure ladder is properly secured\\n2. Use fall protection equipment\\n3. Conduct safety briefing\\n4. Implement buddy system for high work\",\n  \"reportedBy\": \"Safety Supervisor (EMP345)\",\n  \"severity\": \"high\",\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/near-miss",
+              "host": ["{{baseUrl}}"],
+              "path": ["near-miss"]
+            }
+          }
+        },
+        {
+          "name": "Update Near Miss with Actions",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"action_taken\",\n  \"actionsTaken\": \"Implemented mandatory ladder inspection checklist and buddy system for all work at height\",\n  \"actionOwner\": \"Site Supervisor\",\n  \"actionDeadline\": \"2024-01-20T17:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/near-miss/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["near-miss", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Get Overdue Actions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/near-miss/actions/overdue?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["near-miss", "actions", "overdue"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dangerous Occurrence",
+      "item": [
+        {
+          "name": "Create Dangerous Occurrence Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"dateTime\": \"2024-01-15T14:30:00Z\",\n  \"location\": \"Zone A - Construction Site\",\n  \"situation\": \"Crane boom collapsed during lifting operation, narrowly missing workers below. No injuries but significant property damage.\",\n  \"potentialConsequence\": \"Multiple fatalities, serious injuries, major property damage, project shutdown, regulatory investigation\",\n  \"preventiveActions\": \"1. Immediate crane inspection and certification\\n2. Enhanced safety protocols for lifting operations\\n3. Additional training for crane operators\\n4. Regular equipment maintenance schedule\",\n  \"reportedBy\": \"John Smith (EMP345)\",\n  \"investigationRequired\": true,\n  \"severity\": \"critical\",\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/dangerous-occurrence",
+              "host": ["{{baseUrl}}"],
+              "path": ["dangerous-occurrence"]
+            }
+          }
+        },
+        {
+          "name": "Start Investigation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"under_investigation\",\n  \"investigator\": \"Senior Safety Engineer\",\n  \"investigationNotes\": \"Formal investigation initiated to determine root cause\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/dangerous-occurrence/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["dangerous-occurrence", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Complete Investigation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"investigation_complete\",\n  \"investigationFindings\": \"Crane boom failure due to metal fatigue in critical load-bearing component\",\n  \"rootCause\": \"Inadequate maintenance schedule and insufficient inspection protocols\",\n  \"correctiveActions\": \"Implement weekly crane inspections, mandatory certification renewal, enhanced operator training\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/dangerous-occurrence/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["dangerous-occurrence", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Get Active Investigations",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dangerous-occurrence/investigations/active?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["dangerous-occurrence", "investigations", "active"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SIC Meeting",
+      "item": [
+        {
+          "name": "Create SIC Meeting",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"meetingDateTime\": \"2024-01-15T09:00:00Z\",\n  \"attendees\": [\n    {\n      \"name\": \"John Smith\",\n      \"empId\": \"EMP001\",\n      \"contractor\": \"ABC Construction Ltd\"\n    },\n    {\n      \"name\": \"Jane Doe\",\n      \"empId\": \"EMP002\",\n      \"contractor\": \"XYZ Builders\"\n    }\n  ],\n  \"agendaPoints\": [\n    \"Safety performance review\",\n    \"Upcoming work activities\",\n    \"Equipment maintenance schedule\",\n    \"Weather conditions and precautions\"\n  ],\n  \"decisions\": \"1. Implement additional safety measures for high-risk activities\\n2. Schedule equipment inspection for next week\\n3. Conduct safety briefing before each shift\",\n  \"actionOwners\": \"Safety Manager - Equipment inspection\\nSupervisor - Safety briefings\\nForeman - Implementation of safety measures\",\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"],\n  \"sicSignature\": \"data:image/png;base64,...\",\n  \"meetingType\": \"daily\",\n  \"location\": \"Site Office\",\n  \"meetingDuration\": 45\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sic-meeting",
+              "host": ["{{baseUrl}}"],
+              "path": ["sic-meeting"]
+            }
+          }
+        },
+        {
+          "name": "Get SIC Meeting Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/sic-meeting/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["sic-meeting", "stats", "overview"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Pending Action Items",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/sic-meeting/action-items/pending?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["sic-meeting", "action-items", "pending"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Good Practice",
+      "item": [
+        {
+          "name": "Create Good Practice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"date\": \"2024-01-15\",\n  \"title\": \"Innovative Safety Harness Usage\",\n  \"description\": \"Worker John Smith demonstrated exceptional safety awareness by implementing a new double-check system for harness connections, reducing potential fall risks by 40%.\",\n  \"awardable\": true,\n  \"personsCredited\": \"John Smith (EMP001), Safety Team\",\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"],\n  \"category\": \"safety\",\n  \"impactLevel\": \"project_wide\",\n  \"tags\": [\"innovation\", \"safety\", \"harness\", \"fall_protection\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/good-practice",
+              "host": ["{{baseUrl}}"],
+              "path": ["good-practice"]
+            }
+          }
+        },
+        {
+          "name": "Approve Good Practice",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\",\n  \"reviewedBy\": \"Safety Manager\",\n  \"reviewNotes\": \"Excellent safety innovation, approved for team sharing\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/good-practice/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["good-practice", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Award Good Practice",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"awarded\",\n  \"awardType\": \"monetary\",\n  \"awardValue\": 500,\n  \"awardNotes\": \"Outstanding safety innovation award\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/good-practice/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["good-practice", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Like Good Practice",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/good-practice/:id/like",
+              "host": ["{{baseUrl}}"],
+              "path": ["good-practice", ":id", "like"]
+            }
+          }
+        },
+        {
+          "name": "Get Popular Practices",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/good-practice/popular/top?projectId={{projectId}}&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["good-practice", "popular", "top"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "File Upload",
+      "item": [
+        {
+          "name": "Upload Single Image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "test-image.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/upload/image",
+              "host": ["{{baseUrl}}"],
+              "path": ["upload", "image"]
+            }
+          }
+        },
+        {
+          "name": "Upload Multiple Images",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": "test-image1.jpg"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": "test-image2.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/upload/images",
+              "host": ["{{baseUrl}}"],
+              "path": ["upload", "images"]
+            }
+          }
+        },
+        {
+          "name": "Upload Signature",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "signature",
+                  "type": "file",
+                  "src": "signature.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/upload/signature",
+              "host": ["{{baseUrl}}"],
+              "path": ["upload", "signature"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

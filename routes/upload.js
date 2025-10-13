@@ -1,7 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const cloudinary = require("../config/cloudinary");
-const auth = require("../middleware/auth");
+const { auth } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -265,4 +265,3 @@ router.use((error, req, res, next) => {
 });
 
 module.exports = router;
-

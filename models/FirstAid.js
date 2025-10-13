@@ -64,12 +64,6 @@ const firstAidSchema = new mongoose.Schema(
     photos: [
       {
         type: String, // Cloudinary URLs
-        validate: {
-          validator: function (v) {
-            return v.length <= 6; // Max 6 photos
-          },
-          message: "Maximum 6 photos allowed",
-        },
       },
     ],
     status: {

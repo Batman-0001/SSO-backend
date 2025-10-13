@@ -1,7 +1,7 @@
 const express = require("express");
 const { body, validationResult } = require("express-validator");
 const SafetyObservation = require("../models/SafetyObservation");
-const auth = require("../middleware/auth");
+const { auth } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -295,4 +295,3 @@ router.get("/stats/overview", auth, async (req, res) => {
 });
 
 module.exports = router;
-

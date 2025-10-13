@@ -38,12 +38,6 @@ const goodPracticeSchema = new mongoose.Schema(
     photos: [
       {
         type: String, // Cloudinary URLs
-        validate: {
-          validator: function (v) {
-            return v.length <= 6; // Max 6 photos
-          },
-          message: "Maximum 6 photos allowed",
-        },
       },
     ],
     status: {
@@ -219,6 +213,11 @@ goodPracticeSchema.methods.incrementViews = function () {
 
 // Pre-save validation
 goodPracticeSchema.pre("save", function (next) {
+  // Validate photos array length
+  if (this.photos && this.photos.length > 6) {
+    return next(new Error("Maximum 6 photos allowed"));
+  }
+
   // Filter out empty tags
   if (this.tags) {
     this.tags = this.tags.filter((tag) => tag && tag.trim().length > 0);
