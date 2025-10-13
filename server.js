@@ -46,6 +46,7 @@ app.use(
   "/api/safety-advisory-warning",
   require("./routes/safetyAdvisoryWarning")
 );
+app.use("/api/stop-work-order", require("./routes/stopWorkOrder"));
 app.use("/api/upload", require("./routes/upload"));
 app.use("/api/csv-upload", require("./routes/csvUpload"));
 

@@ -511,6 +511,79 @@ GET /api/safety-advisory-warning/active/current?projectId=P123
 Authorization: Bearer <token>
 ```
 
+### Stop Work Order
+
+#### Create Stop Work Order
+
+```
+POST /api/stop-work-order
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "projectId": "P123",
+  "dateTime": "2024-01-15T14:30:00Z",
+  "areaStopped": "Zone B - Excavation Area",
+  "activityStopped": "Excavation and foundation work",
+  "reasonCategory": "unsafe_condition",
+  "reasonDescription": "Unstable soil conditions detected with visible cracks in excavation walls. Risk of collapse imminent.",
+  "issuedBy": "John Smith (EMP345)",
+  "duration": "Until safety measures implemented",
+  "immediateActions": "1. Evacuate all personnel from excavation area\n2. Install temporary shoring\n3. Conduct soil stability assessment\n4. Implement additional safety measures",
+  "photos": ["https://cloudinary.com/image1.jpg"],
+  "sicSignature": "data:image/png;base64,..."
+}
+```
+
+#### Get All Stop Work Orders
+
+```
+GET /api/stop-work-order?page=1&limit=10&reasonCategory=unsafe_condition&status=active&areaStopped=Zone
+Authorization: Bearer <token>
+```
+
+#### Get Single Stop Work Order
+
+```
+GET /api/stop-work-order/:id
+Authorization: Bearer <token>
+```
+
+#### Update Stop Work Order
+
+```
+PUT /api/stop-work-order/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "resolved",
+  "resolvedBy": "Safety Manager",
+  "resolutionNotes": "Additional shoring installed and soil stabilized"
+}
+```
+
+#### Get Stop Work Order Statistics
+
+```
+GET /api/stop-work-order/stats/overview?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Currently Active Stop Work Orders
+
+```
+GET /api/stop-work-order/active/current?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Reason Categories with Counts
+
+```
+GET /api/stop-work-order/reasons/categories?projectId=P123
+Authorization: Bearer <token>
+```
+
 ### Safety Observations
 
 #### Create Safety Observation
