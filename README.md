@@ -353,6 +353,86 @@ GET /api/pep-talk/topics/popular?projectId=P123&limit=10
 Authorization: Bearer <token>
 ```
 
+### Special Technical Training
+
+#### Create Special Training
+
+```
+POST /api/special-training
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "projectId": "P123",
+  "date": "2024-01-15",
+  "topic": "Advanced Scaffolding Techniques",
+  "duration": 120,
+  "trainer": "John Smith",
+  "attendeesCount": 12,
+  "keyPoints": [
+    "Advanced scaffolding assembly techniques",
+    "Safety protocols for high-rise construction",
+    "Load calculation and weight distribution"
+  ],
+  "certificationsIssued": true,
+  "permitRequired": true,
+  "photos": ["https://cloudinary.com/image1.jpg"]
+}
+```
+
+#### Get All Special Training Records
+
+```
+GET /api/special-training?page=1&limit=10&topic=Scaffolding&certificationsIssued=true&permitRequired=true
+Authorization: Bearer <token>
+```
+
+#### Get Single Special Training Record
+
+```
+GET /api/special-training/:id
+Authorization: Bearer <token>
+```
+
+#### Update Special Training Record
+
+```
+PUT /api/special-training/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "certificationsIssued": true,
+  "permitRequired": false,
+  "keyPoints": [
+    "Updated key point 1",
+    "Updated key point 2"
+  ]
+}
+```
+
+#### Get Special Training Statistics
+
+```
+GET /api/special-training/stats/overview?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Popular Special Training Topics
+
+```
+GET /api/special-training/topics/popular?projectId=P123&limit=10
+Authorization: Bearer <token>
+```
+
+#### Get Certification Training Summary
+
+```
+GET /api/special-training/certifications/summary?projectId=P123
+Authorization: Bearer <token>
+```
+
 ### Safety Observations
 
 #### Create Safety Observation
