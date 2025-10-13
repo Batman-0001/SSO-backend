@@ -284,6 +284,75 @@ GET /api/daily-training/topics/popular?projectId=P123&limit=10
 Authorization: Bearer <token>
 ```
 
+### PEP Talk
+
+#### Create PEP Talk
+
+```
+POST /api/pep-talk
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "projectId": "P123",
+  "date": "2024-01-15",
+  "topic": "Environmental Protection and Energy Conservation",
+  "duration": 45,
+  "trainer": "John Smith",
+  "attendeesCount": 20,
+  "keyPoints": [
+    "Energy conservation techniques",
+    "Environmental impact reduction",
+    "Sustainable practices in construction"
+  ],
+  "photos": ["https://cloudinary.com/image1.jpg"]
+}
+```
+
+#### Get All PEP Talk Records
+
+```
+GET /api/pep-talk?page=1&limit=10&topic=Environmental&trainer=John&status=completed
+Authorization: Bearer <token>
+```
+
+#### Get Single PEP Talk Record
+
+```
+GET /api/pep-talk/:id
+Authorization: Bearer <token>
+```
+
+#### Update PEP Talk Record
+
+```
+PUT /api/pep-talk/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "keyPoints": [
+    "Updated key point 1",
+    "Updated key point 2"
+  ]
+}
+```
+
+#### Get PEP Talk Statistics
+
+```
+GET /api/pep-talk/stats/overview?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Popular PEP Talk Topics
+
+```
+GET /api/pep-talk/topics/popular?projectId=P123&limit=10
+Authorization: Bearer <token>
+```
+
 ### Safety Observations
 
 #### Create Safety Observation
