@@ -660,6 +660,86 @@ GET /api/first-aid/follow-up/due?projectId=P123
 Authorization: Bearer <token>
 ```
 
+### Near Miss
+
+#### Create Near Miss Report
+
+```
+POST /api/near-miss
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "projectId": "P123",
+  "dateTime": "2024-01-15T14:30:00Z",
+  "location": "Zone A - Construction Site",
+  "situation": "Worker almost fell from scaffolding while not wearing safety harness. Lost balance while reaching for materials.",
+  "potentialConsequence": "Serious injury or fatality from fall from height. Could have resulted in broken bones, head injury, or death.",
+  "preventiveActions": "1. Ensure all workers wear safety harnesses at all times\n2. Install guardrails on all scaffolding\n3. Conduct daily safety briefings\n4. Implement buddy system for high-risk work",
+  "reportedBy": "John Smith (EMP345)",
+  "severity": "high",
+  "photos": ["https://cloudinary.com/image1.jpg"]
+}
+```
+
+#### Get All Near Miss Reports
+
+```
+GET /api/near-miss?page=1&limit=10&severity=high&status=reported&location=Zone
+Authorization: Bearer <token>
+```
+
+#### Get Single Near Miss Report
+
+```
+GET /api/near-miss/:id
+Authorization: Bearer <token>
+```
+
+#### Update Near Miss Report
+
+```
+PUT /api/near-miss/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "action_taken",
+  "actionsTaken": "Safety harnesses made mandatory, guardrails installed",
+  "actionOwner": "Safety Manager",
+  "actionDeadline": "2024-01-20",
+  "severity": "critical"
+}
+```
+
+#### Get Near Miss Statistics
+
+```
+GET /api/near-miss/stats/overview?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Overdue Actions
+
+```
+GET /api/near-miss/actions/overdue?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Popular Lessons Learned
+
+```
+GET /api/near-miss/lessons/popular?projectId=P123&limit=10
+Authorization: Bearer <token>
+```
+
+#### Get Frequent Locations
+
+```
+GET /api/near-miss/locations/frequent?projectId=P123&limit=10
+Authorization: Bearer <token>
+```
+
 ### Safety Observations
 
 #### Create Safety Observation

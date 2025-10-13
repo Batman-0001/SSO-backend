@@ -48,6 +48,7 @@ app.use(
 );
 app.use("/api/stop-work-order", require("./routes/stopWorkOrder"));
 app.use("/api/first-aid", require("./routes/firstAid"));
+app.use("/api/near-miss", require("./routes/nearMiss"));
 app.use("/api/upload", require("./routes/upload"));
 app.use("/api/csv-upload", require("./routes/csvUpload"));
 
