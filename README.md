@@ -740,6 +740,101 @@ GET /api/near-miss/locations/frequent?projectId=P123&limit=10
 Authorization: Bearer <token>
 ```
 
+### Dangerous Occurrence
+
+#### Create Dangerous Occurrence Report
+
+```
+POST /api/dangerous-occurrence
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "projectId": "P123",
+  "dateTime": "2024-01-15T14:30:00Z",
+  "location": "Zone A - Construction Site",
+  "situation": "Crane boom collapsed during lifting operation, narrowly missing workers below. No injuries but significant property damage.",
+  "potentialConsequence": "Multiple fatalities, serious injuries, major property damage, project shutdown, regulatory investigation",
+  "preventiveActions": "1. Immediate crane inspection and certification\n2. Enhanced safety protocols for lifting operations\n3. Additional training for crane operators\n4. Regular equipment maintenance schedule",
+  "reportedBy": "John Smith (EMP345)",
+  "investigationRequired": true,
+  "severity": "critical",
+  "photos": ["https://cloudinary.com/image1.jpg"]
+}
+```
+
+#### Get All Dangerous Occurrence Reports
+
+```
+GET /api/dangerous-occurrence?page=1&limit=10&severity=critical&status=reported&investigationRequired=true&headOfficeNotified=true
+Authorization: Bearer <token>
+```
+
+#### Get Single Dangerous Occurrence Report
+
+```
+GET /api/dangerous-occurrence/:id
+Authorization: Bearer <token>
+```
+
+#### Update Dangerous Occurrence Report
+
+```
+PUT /api/dangerous-occurrence/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "under_investigation",
+  "investigator": "Safety Manager",
+  "investigationNotes": "Formal investigation initiated",
+  "severity": "critical"
+}
+```
+
+#### Complete Investigation
+
+```
+PUT /api/dangerous-occurrence/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "investigation_complete",
+  "investigationFindings": "Crane boom failure due to metal fatigue in critical load-bearing component",
+  "rootCause": "Inadequate maintenance schedule and insufficient inspection protocols",
+  "correctiveActions": "Implement weekly crane inspections, mandatory certification renewal, enhanced operator training"
+}
+```
+
+#### Get Dangerous Occurrence Statistics
+
+```
+GET /api/dangerous-occurrence/stats/overview?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Active Investigations
+
+```
+GET /api/dangerous-occurrence/investigations/active?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Overdue Actions
+
+```
+GET /api/dangerous-occurrence/actions/overdue?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Pending Regulatory Reports
+
+```
+GET /api/dangerous-occurrence/regulatory/pending?projectId=P123
+Authorization: Bearer <token>
+```
+
 ### Safety Observations
 
 #### Create Safety Observation
