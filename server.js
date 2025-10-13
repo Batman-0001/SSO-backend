@@ -38,7 +38,9 @@ mongoose
 // Routes
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/safety-observations", require("./routes/safetyObservations"));
+app.use("/api/induction-training", require("./routes/inductionTraining"));
 app.use("/api/upload", require("./routes/upload"));
+app.use("/api/csv-upload", require("./routes/csvUpload"));
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
@@ -66,4 +68,3 @@ app.use("*", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-

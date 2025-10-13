@@ -111,6 +111,110 @@ GET /api/auth/me
 Authorization: Bearer <token>
 ```
 
+### Induction Training
+
+#### Create Induction Training
+
+```
+POST /api/induction-training
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "projectId": "P123",
+  "trainingDate": "2024-01-15",
+  "duration": 120,
+  "contractor": "ABC Construction Ltd",
+  "trainerName": "John Smith",
+  "attendanceCount": 25,
+  "attendees": [
+    {
+      "name": "Mike Johnson",
+      "empId": "EMP001",
+      "contractor": "ABC Construction Ltd"
+    },
+    {
+      "name": "Sarah Wilson",
+      "empId": "EMP002",
+      "contractor": "ABC Construction Ltd"
+    }
+  ],
+  "notes": "Safety protocols and emergency procedures covered",
+  "photos": ["https://cloudinary.com/image1.jpg"]
+}
+```
+
+#### Get All Induction Training Records
+
+```
+GET /api/induction-training?page=1&limit=10&contractor=ABC&status=completed
+Authorization: Bearer <token>
+```
+
+#### Get Single Induction Training Record
+
+```
+GET /api/induction-training/:id
+Authorization: Bearer <token>
+```
+
+#### Update Induction Training Record
+
+```
+PUT /api/induction-training/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "notes": "Training completed successfully"
+}
+```
+
+#### Get Induction Training Statistics
+
+```
+GET /api/induction-training/stats/overview?projectId=P123
+Authorization: Bearer <token>
+```
+
+### CSV Upload for Bulk Attendee Data
+
+#### Upload CSV File
+
+```
+POST /api/csv-upload/attendees
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+FormData: csv (file)
+```
+
+#### Validate Attendee Data
+
+```
+POST /api/csv-upload/validate-attendees
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "attendees": [
+    {
+      "name": "John Doe",
+      "empId": "EMP001",
+      "contractor": "ABC Construction Ltd"
+    }
+  ]
+}
+```
+
+#### Download CSV Template
+
+```
+GET /api/csv-upload/template
+Authorization: Bearer <token>
+```
+
 ### Safety Observations
 
 #### Create Safety Observation
@@ -342,4 +446,3 @@ backend/
 ## License
 
 MIT License
-
