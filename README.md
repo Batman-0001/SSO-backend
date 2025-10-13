@@ -942,6 +942,107 @@ Content-Type: application/json
 }
 ```
 
+### Good Practice
+
+#### Create Good Practice
+
+```
+POST /api/good-practice
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "projectId": "P123",
+  "date": "2024-01-15",
+  "title": "Innovative Safety Harness Usage",
+  "description": "Worker John Smith demonstrated exceptional safety awareness by implementing a new double-check system for harness connections, reducing potential fall risks by 40%.",
+  "awardable": true,
+  "personsCredited": "John Smith (EMP001), Safety Team",
+  "photos": ["https://cloudinary.com/image1.jpg"],
+  "category": "safety",
+  "impactLevel": "project_wide",
+  "tags": ["innovation", "safety", "harness", "fall_protection"]
+}
+```
+
+#### Get All Good Practices
+
+```
+GET /api/good-practice?page=1&limit=10&category=safety&status=approved&awardable=true&projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Single Good Practice
+
+```
+GET /api/good-practice/:id
+Authorization: Bearer <token>
+```
+
+#### Update Good Practice
+
+```
+PUT /api/good-practice/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "approved",
+  "reviewedBy": "Safety Manager",
+  "reviewNotes": "Excellent safety innovation, approved for team sharing"
+}
+```
+
+#### Award Good Practice
+
+```
+PUT /api/good-practice/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "awarded",
+  "awardType": "monetary",
+  "awardValue": 500,
+  "awardNotes": "Outstanding safety innovation award"
+}
+```
+
+#### Like Good Practice
+
+```
+PUT /api/good-practice/:id/like
+Authorization: Bearer <token>
+```
+
+#### Get Good Practice Statistics
+
+```
+GET /api/good-practice/stats/overview?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Pending Awards
+
+```
+GET /api/good-practice/awards/pending?projectId=P123
+Authorization: Bearer <token>
+```
+
+#### Get Popular Practices
+
+```
+GET /api/good-practice/popular/top?projectId=P123&limit=10
+Authorization: Bearer <token>
+```
+
+#### Get Category Breakdown
+
+```
+GET /api/good-practice/categories/breakdown?projectId=P123
+Authorization: Bearer <token>
+```
+
 ### Safety Observations
 
 #### Create Safety Observation
