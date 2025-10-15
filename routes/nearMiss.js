@@ -17,17 +17,26 @@ router.post(
       body("dateTime")
         .isISO8601()
         .withMessage("Valid date and time is required"),
-      body("location").notEmpty().withMessage("Location is required"),
+      body("location")
+        .optional()
+        .notEmpty()
+        .withMessage("Location is required"),
       body("situation")
+        .optional()
         .notEmpty()
         .withMessage("Situation description is required"),
       body("potentialConsequence")
+        .optional()
         .notEmpty()
         .withMessage("Potential consequence is required"),
       body("preventiveActions")
+        .optional()
         .notEmpty()
         .withMessage("Preventive actions are required"),
-      body("reportedBy").notEmpty().withMessage("Reported by is required"),
+      body("reportedBy")
+        .optional()
+        .notEmpty()
+        .withMessage("Reported by is required"),
       body("severity")
         .optional()
         .isIn(["low", "medium", "high", "critical"])
@@ -36,6 +45,10 @@ router.post(
         .optional()
         .isArray()
         .withMessage("Photos must be an array"),
+      body("status")
+        .optional()
+        .isIn(["draft", "reported"])
+        .withMessage("Status must be draft or reported"),
     ],
   ],
   async (req, res) => {
@@ -55,6 +68,83 @@ router.post(
         reportedBy,
         severity = "medium",
         photos = [],
+        status = "draft",
+      } = req.body;
+
+      // Determine status based on completeness for automatic submission
+      let finalStatus = status;
+      if (
+        status === "reported" ||
+        (location &&
+          situation &&
+          potentialConsequence &&
+          preventiveActions &&
+          reportedBy)
+      ) {
+        finalStatus = "reported";
+      }
+
+      const nearMiss = new NearMiss({
+        projectId,
+        dateTime: new Date(dateTime),
+        location: location || "",
+        situation: situation || "",
+        potentialConsequence: potentialConsequence || "",
+        preventiveActions: preventiveActions || "",
+        reportedBy: reportedBy || "",
+        severity,
+        photos,
+        status: finalStatus,
+        createdBy: req.user.id,
+      });
+
+      await nearMiss.save();
+
+      res.status(201).json({
+        message:
+          finalStatus === "draft"
+            ? "Near miss report saved as draft"
+            : "Near miss report submitted successfully",
+        data: nearMiss,
+      });
+    } catch (error) {
+      console.error("Error creating near miss report:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
+
+// @route   POST /api/near-miss/save-draft
+// @desc    Save near miss report as draft (minimal validation)
+// @access  Private
+router.post(
+  "/save-draft",
+  [
+    auth,
+    [
+      body("projectId").notEmpty().withMessage("Project ID is required"),
+      body("dateTime")
+        .isISO8601()
+        .withMessage("Valid date and time is required"),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const {
+        projectId,
+        dateTime,
+        location = "",
+        situation = "",
+        potentialConsequence = "",
+        preventiveActions = "",
+        reportedBy = "",
+        severity = "medium",
+        photos = [],
       } = req.body;
 
       const nearMiss = new NearMiss({
@@ -67,17 +157,18 @@ router.post(
         reportedBy,
         severity,
         photos,
+        status: "draft",
         createdBy: req.user.id,
       });
 
       await nearMiss.save();
 
       res.status(201).json({
-        message: "Near miss report created successfully",
+        message: "Draft saved successfully",
         data: nearMiss,
       });
     } catch (error) {
-      console.error("Error creating near miss report:", error);
+      console.error("Error saving near miss draft:", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -93,7 +184,7 @@ router.get("/", auth, async (req, res) => {
       limit = 10,
       projectId,
       severity,
-      status = "reported",
+      status,
       location,
       sortBy = "dateTime",
       sortOrder = "desc",
@@ -161,7 +252,7 @@ router.put(
     [
       body("status")
         .optional()
-        .isIn(["reported", "under_review", "action_taken", "closed"]),
+        .isIn(["draft", "reported", "under_review", "action_taken", "closed"]),
       body("severity").optional().isIn(["low", "medium", "high", "critical"]),
       body("actionDeadline")
         .optional()
@@ -305,6 +396,9 @@ router.get("/stats/overview", auth, async (req, res) => {
         $group: {
           _id: null,
           total: { $sum: 1 },
+          draft: {
+            $sum: { $cond: [{ $eq: ["$status", "draft"] }, 1, 0] },
+          },
           reported: {
             $sum: { $cond: [{ $eq: ["$status", "reported"] }, 1, 0] },
           },

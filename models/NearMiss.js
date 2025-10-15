@@ -48,8 +48,8 @@ const nearMissSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ["reported", "under_review", "action_taken", "closed"],
-      default: "reported",
+      enum: ["draft", "reported", "under_review", "action_taken", "closed"],
+      default: "draft",
     },
     severity: {
       type: String,
@@ -169,6 +169,22 @@ nearMissSchema.methods.shareWithTeam = function () {
 
 // Pre-save validation
 nearMissSchema.pre("save", function (next) {
+  // Only validate required fields for non-draft status
+  if (this.status !== "draft") {
+    // Validate required fields for submitted reports
+    if (
+      !this.location ||
+      !this.situation ||
+      !this.potentialConsequence ||
+      !this.preventiveActions ||
+      !this.reportedBy
+    ) {
+      return next(
+        new Error("All required fields must be filled for submitted reports")
+      );
+    }
+  }
+
   // Validate action deadline if action is assigned
   if (this.status === "action_taken" && !this.actionDeadline) {
     return next(
