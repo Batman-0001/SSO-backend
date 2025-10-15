@@ -115,6 +115,27 @@
           }
         },
         {
+          "name": "Save Safety Observation Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"type\": \"unsafe_act\",\n  \"dateTime\": \"2024-01-15T10:30:00Z\",\n  \"location\": \"Zone A - Crane 3\",\n  \"observedBy\": \"John Smith (EMP345)\",\n  \"severity\": \"Medium\",\n  \"description\": \"Partial observation details...\",\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/safety-observations/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["safety-observations", "save-draft"]
+            }
+          }
+        },
+        {
           "name": "Get All Safety Observations",
           "request": {
             "method": "GET",
@@ -138,6 +159,23 @@
                 {
                   "key": "severity",
                   "value": "Medium"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Safety Observation Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/safety-observations/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["safety-observations", "stats", "overview"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
                 }
               ]
             }
@@ -227,6 +265,27 @@
           }
         },
         {
+          "name": "Save Induction Training Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"date\": \"2024-01-15\",\n  \"topic\": \"Site Safety Induction\",\n  \"duration\": 120,\n  \"trainer\": \"Safety Manager\",\n  \"attendeesCount\": 5,\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/induction-training/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["induction-training", "save-draft"]
+            }
+          }
+        },
+        {
           "name": "Get Induction Training Statistics",
           "request": {
             "method": "GET",
@@ -308,6 +367,31 @@
           }
         },
         {
+          "name": "Get All Daily Training Talks",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/daily-training?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["daily-training"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Get Daily Training Statistics",
           "request": {
             "method": "GET",
@@ -321,6 +405,27 @@
                   "value": "{{projectId}}"
                 }
               ]
+            }
+          }
+        },
+        {
+          "name": "Save Daily Training Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"date\": \"2024-01-15\",\n  \"topic\": \"Fall Protection\",\n  \"duration\": 30,\n  \"trainer\": \"Safety Supervisor\",\n  \"attendeesCount\": 25,\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/daily-training/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["daily-training", "save-draft"]
             }
           }
         },
@@ -370,6 +475,69 @@
               "path": ["pep-talk"]
             }
           }
+        },
+        {
+          "name": "Get All PEP Talks",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/pep-talk?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pep-talk"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Save PEP Talk Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"date\": \"2024-01-15\",\n  \"topic\": \"Environmental Protection\",\n  \"duration\": 45,\n  \"trainer\": \"Environmental Officer\",\n  \"attendeesCount\": 30,\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pep-talk/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["pep-talk", "save-draft"]
+            }
+          }
+        },
+        {
+          "name": "Get PEP Talk Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/pep-talk/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pep-talk", "stats", "overview"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
         }
       ]
     },
@@ -398,6 +566,52 @@
           }
         },
         {
+          "name": "Save Special Training Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"date\": \"2024-01-15\",\n  \"topic\": \"Crane Operation Certification\",\n  \"duration\": 480,\n  \"trainer\": \"Certified Crane Instructor\",\n  \"attendeesCount\": 8,\n  \"certificationsIssued\": true,\n  \"permitRequired\": true,\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/special-training/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["special-training", "save-draft"]
+            }
+          }
+        },
+        {
+          "name": "Get All Special Technical Training",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/special-training?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["special-training"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Get Certification Summary",
           "request": {
             "method": "GET",
@@ -405,6 +619,23 @@
               "raw": "{{baseUrl}}/special-training/certifications/summary?projectId={{projectId}}",
               "host": ["{{baseUrl}}"],
               "path": ["special-training", "certifications", "summary"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Special Training Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/special-training/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["special-training", "stats", "overview"],
               "query": [
                 {
                   "key": "projectId",
@@ -462,6 +693,52 @@
           }
         },
         {
+          "name": "Save Safety Advisory Warning Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"date\": \"2024-01-15\",\n  \"warningTitle\": \"High Wind Conditions Alert\",\n  \"severity\": \"high\",\n  \"affectedArea\": \"All elevated work areas\",\n  \"description\": \"Wind speeds exceeding 25 mph detected\",\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/safety-advisory-warning/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["safety-advisory-warning", "save-draft"]
+            }
+          }
+        },
+        {
+          "name": "Get All Safety Advisory Warnings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/safety-advisory-warning?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["safety-advisory-warning"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Get Active Warnings",
           "request": {
             "method": "GET",
@@ -469,6 +746,23 @@
               "raw": "{{baseUrl}}/safety-advisory-warning/active?projectId={{projectId}}",
               "host": ["{{baseUrl}}"],
               "path": ["safety-advisory-warning", "active"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Safety Advisory Warning Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/safety-advisory-warning/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["safety-advisory-warning", "stats", "overview"],
               "query": [
                 {
                   "key": "projectId",
@@ -522,6 +816,52 @@
               "raw": "{{baseUrl}}/stop-work-order/:id",
               "host": ["{{baseUrl}}"],
               "path": ["stop-work-order", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Save Stop Work Order Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"dateTime\": \"2024-01-15T14:30:00Z\",\n  \"areaStopped\": \"Zone B - Excavation Area\",\n  \"activityStopped\": \"Excavation work\",\n  \"reasonCategory\": \"unsafe_condition\",\n  \"reasonDescription\": \"Unstable soil conditions detected\",\n  \"issuedBy\": \"Safety Inspector (EMP789)\",\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/stop-work-order/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["stop-work-order", "save-draft"]
+            }
+          }
+        },
+        {
+          "name": "Get All Stop Work Orders",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/stop-work-order?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["stop-work-order"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
             }
           }
         },
@@ -590,6 +930,31 @@
           }
         },
         {
+          "name": "Get All First-Aid Cases",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/first-aid?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["first-aid"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Get First-Aid Statistics",
           "request": {
             "method": "GET",
@@ -603,6 +968,27 @@
                   "value": "{{projectId}}"
                 }
               ]
+            }
+          }
+        },
+        {
+          "name": "Save First-Aid Case Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"dateTime\": \"2024-01-15T11:45:00Z\",\n  \"victimName\": \"John Smith\",\n  \"victimEmpId\": \"EMP123\",\n  \"injuryType\": \"cut\",\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/first-aid/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["first-aid", "save-draft"]
             }
           }
         },
@@ -671,6 +1057,52 @@
           }
         },
         {
+          "name": "Save Near Miss Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"dateTime\": \"2024-01-15T15:30:00Z\",\n  \"location\": \"Zone C - Scaffolding Area\",\n  \"situation\": \"Worker almost fell from unsecured ladder\",\n  \"reportedBy\": \"Safety Supervisor (EMP345)\",\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/near-miss/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["near-miss", "save-draft"]
+            }
+          }
+        },
+        {
+          "name": "Get All Near Miss Reports",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/near-miss?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["near-miss"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Get Overdue Actions",
           "request": {
             "method": "GET",
@@ -678,6 +1110,23 @@
               "raw": "{{baseUrl}}/near-miss/actions/overdue?projectId={{projectId}}",
               "host": ["{{baseUrl}}"],
               "path": ["near-miss", "actions", "overdue"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Near Miss Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/near-miss/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["near-miss", "stats", "overview"],
               "query": [
                 {
                   "key": "projectId",
@@ -756,6 +1205,52 @@
           }
         },
         {
+          "name": "Save Dangerous Occurrence Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"dateTime\": \"2024-01-15T14:30:00Z\",\n  \"location\": \"Zone A - Construction Site\",\n  \"situation\": \"Crane boom collapsed during lifting operation\",\n  \"reportedBy\": \"John Smith (EMP345)\",\n  \"investigationRequired\": true,\n  \"severity\": \"critical\",\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/dangerous-occurrence/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["dangerous-occurrence", "save-draft"]
+            }
+          }
+        },
+        {
+          "name": "Get All Dangerous Occurrence Reports",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dangerous-occurrence?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["dangerous-occurrence"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Get Active Investigations",
           "request": {
             "method": "GET",
@@ -763,6 +1258,23 @@
               "raw": "{{baseUrl}}/dangerous-occurrence/investigations/active?projectId={{projectId}}",
               "host": ["{{baseUrl}}"],
               "path": ["dangerous-occurrence", "investigations", "active"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Dangerous Occurrence Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dangerous-occurrence/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["dangerous-occurrence", "stats", "overview"],
               "query": [
                 {
                   "key": "projectId",
@@ -799,6 +1311,31 @@
           }
         },
         {
+          "name": "Get All SIC Meetings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/sic-meeting?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["sic-meeting"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Get SIC Meeting Statistics",
           "request": {
             "method": "GET",
@@ -812,6 +1349,27 @@
                   "value": "{{projectId}}"
                 }
               ]
+            }
+          }
+        },
+        {
+          "name": "Save SIC Meeting Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"meetingDateTime\": \"2024-01-15T09:00:00Z\",\n  \"location\": \"Site Office\",\n  \"meetingType\": \"daily\",\n  \"meetingDuration\": 45,\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sic-meeting/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["sic-meeting", "save-draft"]
             }
           }
         },
@@ -912,6 +1470,69 @@
           }
         },
         {
+          "name": "Save Good Practice Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"date\": \"2024-01-15\",\n  \"title\": \"Innovative Safety Method\",\n  \"description\": \"New approach to safety\",\n  \"isAwardable\": true,\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/good-practice/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["good-practice", "save-draft"]
+            }
+          }
+        },
+        {
+          "name": "Get All Good Practices",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/good-practice?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["good-practice"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Good Practice Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/good-practice/stats?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["good-practice", "stats"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Get Popular Practices",
           "request": {
             "method": "GET",
@@ -1005,6 +1626,612 @@
               "raw": "{{baseUrl}}/upload/signature",
               "host": ["{{baseUrl}}"],
               "path": ["upload", "signature"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Daily Briefing",
+      "item": [
+        {
+          "name": "Create Daily Briefing",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"talkNumber\": \"TBT-2025-001\",\n  \"dateTime\": \"2025-01-15T10:00:00Z\",\n  \"location\": \"Zone A - Main Construction Area\",\n  \"conductedBy\": \"John Smith (SSO)\",\n  \"duration\": \"30\",\n  \"topicCategory\": \"Working at Height\",\n  \"customTopic\": \"\",\n  \"attendeesCount\": 25,\n  \"attendanceMethod\": \"digital\",\n  \"signatures\": \"data:image/png;base64,...\",\n  \"attendancePhoto\": [],\n  \"attendeesList\": \"\",\n  \"keyPoints\": [\n    \"Check safety harness and lanyard before use\",\n    \"Ensure guardrails are in place\",\n    \"Use proper ladder safety techniques\"\n  ],\n  \"hazardsDiscussed\": \"Fall hazards, unstable surfaces, weather conditions\",\n  \"controlMeasures\": \"Safety harnesses, guardrails, buddy system, weather monitoring\",\n  \"questionsRaised\": \"Clarification on new harness inspection procedures\",\n  \"photos\": [\"https://cloudinary.com/image1.jpg\", \"https://cloudinary.com/image2.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/daily-briefing",
+              "host": ["{{baseUrl}}"],
+              "path": ["daily-briefing"]
+            }
+          }
+        },
+        {
+          "name": "Get All Daily Briefings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/daily-briefing?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["daily-briefing"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Daily Briefing Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/daily-briefing/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["daily-briefing", "stats", "overview"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Incident Report",
+      "item": [
+        {
+          "name": "Create Incident Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"incidentId\": \"INC-2025-001\",\n  \"dateTime\": \"2025-01-15T14:30:00Z\",\n  \"location\": \"Zone B - Excavation Area\",\n  \"incidentType\": \"near_miss\",\n  \"severity\": \"high\",\n  \"quickPhotos\": [\"https://cloudinary.com/quick1.jpg\"],\n  \"description\": \"Worker almost fell into unguarded excavation pit\",\n  \"activity\": \"Excavation work\",\n  \"equipment\": \"Excavator, safety barriers\",\n  \"weather\": \"Clear, 25°C\",\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"],\n  \"personName\": \"Mike Johnson\",\n  \"personRole\": \"Excavator Operator\",\n  \"personCompany\": \"ABC Construction Ltd\",\n  \"injuryDetails\": \"No injuries\",\n  \"treatment\": \"None required\",\n  \"witnessName\": \"John Smith\",\n  \"witnessStatement\": \"Saw the incident, worker was not following safety protocols\",\n  \"immediateCause\": \"Missing safety barrier around excavation pit\",\n  \"rootCause\": \"Inadequate safety procedures and supervision\",\n  \"immediateActions\": \"Installed safety barriers, stopped work in area\",\n  \"correctiveActions\": \"Enhanced safety training, increased supervision, regular safety audits\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/incident-report",
+              "host": ["{{baseUrl}}"],
+              "path": ["incident-report"]
+            }
+          }
+        },
+        {
+          "name": "Quick Save Incident Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"dateTime\": \"2025-01-15T14:30:00Z\",\n  \"location\": \"Zone B - Excavation Area\",\n  \"incidentType\": \"near_miss\",\n  \"severity\": \"high\",\n  \"quickPhotos\": [\"https://cloudinary.com/quick1.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/incident-report/quick-save",
+              "host": ["{{baseUrl}}"],
+              "path": ["incident-report", "quick-save"]
+            }
+          }
+        },
+        {
+          "name": "Save Draft Incident Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"dateTime\": \"2025-01-15T14:30:00Z\",\n  \"location\": \"Zone B - Excavation Area\",\n  \"incidentType\": \"near_miss\",\n  \"severity\": \"high\",\n  \"quickPhotos\": [\"https://cloudinary.com/quick1.jpg\"],\n  \"description\": \"Partial description of incident...\",\n  \"photos\": [\"https://cloudinary.com/image1.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/incident-report/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["incident-report", "save-draft"]
+            }
+          }
+        },
+        {
+          "name": "Get All Incident Reports",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/incident-report?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["incident-report"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Incident Report Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/incident-report/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["incident-report", "stats", "overview"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Site Inspection",
+      "item": [
+        {
+          "name": "Create Inspection Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"scaffolding\",\n  \"title\": \"Scaffolding Inspection\",\n  \"description\": \"Comprehensive scaffolding safety inspection\",\n  \"icon\": \"🏗️\",\n  \"projectId\": \"{{projectId}}\",\n  \"checklistItems\": [\n    {\n      \"id\": \"scaff-001\",\n      \"item\": \"Scaffold structure is stable and properly braced\",\n      \"requiresPhoto\": true,\n      \"requiresAction\": true,\n      \"category\": \"structural\"\n    },\n    {\n      \"id\": \"scaff-002\",\n      \"item\": \"Guardrails and toe boards are in place\",\n      \"requiresPhoto\": true,\n      \"requiresAction\": false,\n      \"category\": \"safety\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/site-inspection/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["site-inspection", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Create Inspection Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"categoryId\": \"scaffolding\",\n  \"inspectorName\": \"John Smith\",\n  \"inspectorId\": \"EMP001\",\n  \"inspectionDate\": \"2025-01-15T09:00:00Z\",\n  \"location\": \"Zone A - Main Building\",\n  \"itemResults\": [\n    {\n      \"itemId\": \"scaff-001\",\n      \"status\": \"pass\",\n      \"notes\": \"Structure is stable and properly braced\",\n      \"photos\": [\"https://cloudinary.com/image1.jpg\"]\n    },\n    {\n      \"itemId\": \"scaff-002\",\n      \"status\": \"fail\",\n      \"notes\": \"Missing toe boards on level 3\",\n      \"photos\": [\"https://cloudinary.com/image2.jpg\"]\n    }\n  ],\n  \"overallStatus\": \"needs_attention\",\n  \"actionItems\": [\n    {\n      \"itemId\": \"scaff-002\",\n      \"description\": \"Install missing toe boards on level 3\",\n      \"priority\": \"high\",\n      \"assignedTo\": \"Site Supervisor\",\n      \"dueDate\": \"2025-01-16T17:00:00Z\"\n    }\n  ],\n  \"photos\": [\"https://cloudinary.com/overall1.jpg\"],\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/site-inspection/results",
+              "host": ["{{baseUrl}}"],
+              "path": ["site-inspection", "results"]
+            }
+          }
+        },
+        {
+          "name": "Save Inspection Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"categoryId\": \"scaffolding\",\n  \"inspectorName\": \"John Smith\",\n  \"inspectorId\": \"EMP001\",\n  \"inspectionDate\": \"2025-01-15T09:00:00Z\",\n  \"location\": \"Zone A - Main Building\",\n  \"itemResults\": [\n    {\n      \"itemId\": \"scaff-001\",\n      \"status\": \"pass\",\n      \"notes\": \"Structure is stable\",\n      \"photos\": [\"https://cloudinary.com/image1.jpg\"]\n    }\n  ],\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/site-inspection/results/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["site-inspection", "results", "save-draft"]
+            }
+          }
+        },
+        {
+          "name": "Get All Inspection Categories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/site-inspection/categories?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["site-inspection", "categories"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Inspection Results",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/site-inspection/results?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["site-inspection", "results"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Inspection Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/site-inspection/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["site-inspection", "stats", "overview"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PPE Compliance",
+      "item": [
+        {
+          "name": "Create PPE Compliance Check (Quick Mode)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"mode\": \"quick\",\n  \"area\": \"Zone A - Construction Area\",\n  \"activity\": \"General construction work\",\n  \"auditorName\": \"John Smith\",\n  \"auditorId\": \"EMP001\",\n  \"workersCount\": 25,\n  \"compliantCount\": 22,\n  \"groupPhotos\": [\"https://cloudinary.com/group1.jpg\"],\n  \"notes\": \"Most workers compliant, minor issues with helmet usage\",\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ppe-compliance",
+              "host": ["{{baseUrl}}"],
+              "path": ["ppe-compliance"]
+            }
+          }
+        },
+        {
+          "name": "Create PPE Compliance Check (Detailed Mode)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"mode\": \"detailed\",\n  \"area\": \"Zone B - Electrical Work\",\n  \"activity\": \"Electrical installation\",\n  \"auditorName\": \"Jane Doe\",\n  \"auditorId\": \"EMP002\",\n  \"workerAudits\": [\n    {\n      \"workerName\": \"Mike Johnson\",\n      \"workerId\": \"EMP003\",\n      \"contractor\": \"ABC Electrical\",\n      \"ppeItems\": [\n        {\n          \"item\": \"hard_hat\",\n          \"condition\": \"good\",\n          \"compliant\": true,\n          \"notes\": \"Properly fitted and secured\"\n        },\n        {\n          \"item\": \"safety_glasses\",\n          \"condition\": \"good\",\n          \"compliant\": true,\n          \"notes\": \"Clean and properly positioned\"\n        },\n        {\n          \"item\": \"safety_boots\",\n          \"condition\": \"poor\",\n          \"compliant\": false,\n          \"notes\": \"Sole separation, needs replacement\"\n        }\n      ],\n      \"overallCompliant\": false,\n      \"photos\": [\"https://cloudinary.com/worker1.jpg\"]\n    }\n  ],\n  \"actionItems\": [\n    {\n      \"workerId\": \"EMP003\",\n      \"description\": \"Replace safety boots - sole separation\",\n      \"priority\": \"high\",\n      \"assignedTo\": \"Site Supervisor\",\n      \"dueDate\": \"2025-01-16T09:00:00Z\"\n    }\n  ],\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ppe-compliance",
+              "host": ["{{baseUrl}}"],
+              "path": ["ppe-compliance"]
+            }
+          }
+        },
+        {
+          "name": "Save PPE Compliance Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"mode\": \"quick\",\n  \"area\": \"Zone A - Construction Area\",\n  \"activity\": \"General construction work\",\n  \"auditorName\": \"John Smith\",\n  \"auditorId\": \"EMP001\",\n  \"workersCount\": 25,\n  \"compliantCount\": 22,\n  \"status\": \"draft\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ppe-compliance/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["ppe-compliance", "save-draft"]
+            }
+          }
+        },
+        {
+          "name": "Get All PPE Compliance Checks",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/ppe-compliance?page=1&limit=10&projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["ppe-compliance"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get PPE Compliance Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/ppe-compliance/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["ppe-compliance", "stats", "overview"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "End of Day Report",
+      "item": [
+        {
+          "name": "Create End of Day Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"reportDate\": \"2025-01-15T00:00:00.000Z\",\n  \"workStatistics\": {\n    \"totalWorkers\": 45,\n    \"meilEmployees\": 12,\n    \"subcontractor\": 30,\n    \"visitors\": 3,\n    \"manHours\": 360,\n    \"safeDays\": 127,\n    \"highRiskActivities\": [\n      {\n        \"activity\": \"height\",\n        \"count\": 15\n      },\n      {\n        \"activity\": \"hotwork\",\n        \"count\": 8\n      }\n    ],\n    \"workPermits\": {\n      \"height\": 5,\n      \"hotWork\": 3,\n      \"excavation\": 2\n    }\n  },\n  \"safetyPerformance\": {\n    \"safetyScore\": 98,\n    \"ppeCompliance\": 88,\n    \"housekeeping\": 95,\n    \"equipmentSafety\": 92,\n    \"scoreBreakdown\": {\n      \"briefingCompletion\": { \"score\": 20, \"maxScore\": 20 },\n      \"inspectionQuality\": { \"score\": 25, \"maxScore\": 25 },\n      \"ppeCompliance\": { \"score\": 18, \"maxScore\": 20 },\n      \"observationsLogged\": { \"score\": 15, \"maxScore\": 15 },\n      \"zeroIncidents\": { \"score\": 20, \"maxScore\": 20 }\n    }\n  },\n  \"activitiesSummary\": {\n    \"toolboxTalks\": {\n      \"count\": 1,\n      \"attendees\": 45,\n      \"topics\": [\"Working at Height\"]\n    },\n    \"siteInspections\": {\n      \"count\": 2,\n      \"categories\": [\"Scaffolding\", \"PPE Compliance\"]\n    },\n    \"incidentsReported\": {\n      \"count\": 0,\n      \"types\": []\n    },\n    \"observationsLogged\": {\n      \"count\": 5,\n      \"safe\": 3,\n      \"unsafe\": 2\n    },\n    \"openActions\": {\n      \"count\": 6,\n      \"critical\": 1,\n      \"high\": 2,\n      \"medium\": 3,\n      \"low\": 0\n    }\n  },\n  \"ssoReview\": {\n    \"siteStatus\": \"good\",\n    \"highlights\": \"Excellent safety performance with zero incidents. All high-risk activities completed safely with proper permits and supervision.\",\n    \"concerns\": \"PPE compliance slightly below target at 88%. Need to reinforce helmet usage in Zone B.\",\n    \"tomorrowPlan\": \"Focus on PPE compliance training for Zone B workers. Continue height work safety protocols.\",\n    \"weatherImpact\": \"Mild weather conditions, no impact on operations\",\n    \"equipmentIssues\": \"All equipment functioning normally\",\n    \"photos\": [\"https://cloudinary.com/image1.jpg\", \"https://cloudinary.com/image2.jpg\"],\n    \"ssoSignature\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...\"\n  },\n  \"status\": \"submitted\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/end-of-day-report",
+              "host": ["{{baseUrl}}"],
+              "path": ["end-of-day-report"]
+            }
+          }
+        },
+        {
+          "name": "Save End of Day Report as Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"reportDate\": \"2025-01-15T00:00:00.000Z\",\n  \"workStatistics\": {\n    \"totalWorkers\": 45,\n    \"meilEmployees\": 12,\n    \"subcontractor\": 30,\n    \"visitors\": 3,\n    \"manHours\": 360\n  },\n  \"safetyPerformance\": {\n    \"ppeCompliance\": 88,\n    \"housekeeping\": 95,\n    \"equipmentSafety\": 92\n  },\n  \"ssoReview\": {\n    \"highlights\": \"\",\n    \"concerns\": \"\",\n    \"tomorrowPlan\": \"\",\n    \"photos\": [],\n    \"ssoSignature\": \"\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/end-of-day-report/save-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["end-of-day-report", "save-draft"]
+            }
+          }
+        },
+        {
+          "name": "Get All End of Day Reports",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/end-of-day-report?page=1&limit=10&projectId={{projectId}}&status=submitted",
+              "host": ["{{baseUrl}}"],
+              "path": ["end-of-day-report"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                },
+                {
+                  "key": "status",
+                  "value": "submitted"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get End of Day Report by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/end-of-day-report/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["end-of-day-report", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Update End of Day Report",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\",\n  \"workStatistics\": {\n    \"totalWorkers\": 47,\n    \"manHours\": 376\n  },\n  \"safetyPerformance\": {\n    \"ppeCompliance\": 90,\n    \"safetyScore\": 99\n  },\n  \"ssoReview\": {\n    \"siteStatus\": \"excellent\",\n    \"highlights\": \"Updated highlights with additional achievements\",\n    \"concerns\": \"Updated concerns based on latest observations\"\n  },\n  \"approvedBy\": \"Safety Manager - Jane Doe\",\n  \"approvalNotes\": \"Report reviewed and approved with minor updates.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/end-of-day-report/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["end-of-day-report", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Delete End of Day Report",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/end-of-day-report/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["end-of-day-report", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Get End of Day Report Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/end-of-day-report/stats/overview?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["end-of-day-report", "stats", "overview"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Safety Performance Trends",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/end-of-day-report/performance/trends?projectId={{projectId}}&days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["end-of-day-report", "performance", "trends"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                },
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Workforce Analytics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/end-of-day-report/workforce/analytics?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["end-of-day-report", "workforce", "analytics"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Latest End of Day Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/end-of-day-report/latest?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["end-of-day-report", "latest"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
             }
           }
         }
