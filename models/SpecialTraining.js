@@ -42,9 +42,10 @@ const specialTrainingSchema = new mongoose.Schema(
         trim: true,
         validate: {
           validator: function (v) {
-            return v && v.trim().length > 0;
+            // Required only if status is not 'draft'
+            return this.status === "draft" || (v && v.trim().length > 0);
           },
-          message: "Key points cannot be empty",
+          message: "Key points cannot be empty for submitted trainings",
         },
       },
     ],
@@ -63,8 +64,8 @@ const specialTrainingSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ["scheduled", "completed", "cancelled"],
-      default: "completed",
+      enum: ["draft", "scheduled", "completed", "cancelled"],
+      default: "draft",
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -120,9 +121,11 @@ specialTrainingSchema.pre("save", function (next) {
     (point) => point && point.trim().length > 0
   );
 
-  // Validate that we have at least one key point
-  if (this.keyPoints.length === 0) {
-    return next(new Error("At least one key point is required"));
+  // Validate that we have at least one key point for non-draft status
+  if (this.status !== "draft" && this.keyPoints.length === 0) {
+    return next(
+      new Error("At least one key point is required for submitted trainings")
+    );
   }
 
   // Validate training date is not in the future for completed trainings
