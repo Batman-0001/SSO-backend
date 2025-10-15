@@ -15,20 +15,30 @@ router.post(
     [
       body("projectId").notEmpty().withMessage("Project ID is required"),
       body("type")
+        .optional()
         .isIn(["unsafe_act", "unsafe_condition"])
         .withMessage("Invalid observation type"),
       body("dateTime")
         .isISO8601()
         .withMessage("Valid date and time is required"),
-      body("location").notEmpty().withMessage("Location is required"),
-      body("observedBy").notEmpty().withMessage("Observed by is required"),
+      body("location")
+        .optional()
+        .notEmpty()
+        .withMessage("Location is required"),
+      body("observedBy")
+        .optional()
+        .notEmpty()
+        .withMessage("Observed by is required"),
       body("severity")
+        .optional()
         .isIn(["Low", "Medium", "High", "Critical"])
         .withMessage("Invalid severity level"),
       body("description")
+        .optional()
         .isLength({ min: 10 })
         .withMessage("Description must be at least 10 characters"),
       body("actionOwner")
+        .optional()
         .isIn(["site_incharge", "contractor_rep", "other"])
         .withMessage("Invalid action owner"),
       body("photos")
@@ -39,6 +49,10 @@ router.post(
         .optional()
         .isISO8601()
         .withMessage("Invalid target closure date"),
+      body("status")
+        .optional()
+        .isIn(["draft", "open"])
+        .withMessage("Status must be draft or open"),
     ],
   ],
   async (req, res) => {
@@ -62,10 +76,26 @@ router.post(
         targetClosureDate,
         photos = [],
         signature = "",
+        status = "draft",
       } = req.body;
 
-      // Validate corrective action requirement
+      // Determine status based on completeness for automatic submission
+      let finalStatus = status;
       if (
+        status === "open" ||
+        (type &&
+          location &&
+          observedBy &&
+          severity &&
+          description &&
+          actionOwner)
+      ) {
+        finalStatus = "open";
+      }
+
+      // Validate corrective action requirement for submitted observations
+      if (
+        finalStatus === "open" &&
         ["Medium", "High", "Critical"].includes(severity) &&
         !correctiveAction
       ) {
@@ -74,6 +104,79 @@ router.post(
             "Corrective action is required for Medium/High/Critical severity",
         });
       }
+
+      const safetyObservation = new SafetyObservation({
+        projectId,
+        type: type || "",
+        dateTime: new Date(dateTime),
+        location: location || "",
+        observedBy: observedBy || "",
+        observedPerson: observedPerson || "",
+        severity: severity || "",
+        description: description || "",
+        correctiveAction: correctiveAction || "",
+        actionOwner: actionOwner || "",
+        targetClosureDate: targetClosureDate
+          ? new Date(targetClosureDate)
+          : undefined,
+        photos,
+        signature,
+        status: finalStatus,
+        createdBy: req.user.id,
+      });
+
+      await safetyObservation.save();
+
+      res.status(201).json({
+        message:
+          finalStatus === "draft"
+            ? "Safety observation saved as draft"
+            : "Safety observation submitted successfully",
+        data: safetyObservation,
+      });
+    } catch (error) {
+      console.error("Error creating safety observation:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
+
+// @route   POST /api/safety-observations/save-draft
+// @desc    Save safety observation as draft (minimal validation)
+// @access  Private
+router.post(
+  "/save-draft",
+  [
+    auth,
+    [
+      body("projectId").notEmpty().withMessage("Project ID is required"),
+      body("dateTime")
+        .isISO8601()
+        .withMessage("Valid date and time is required"),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const {
+        projectId,
+        dateTime,
+        type = "",
+        location = "",
+        observedBy = "",
+        observedPerson = "",
+        severity = "",
+        description = "",
+        correctiveAction = "",
+        actionOwner = "",
+        targetClosureDate,
+        photos = [],
+        signature = "",
+      } = req.body;
 
       const safetyObservation = new SafetyObservation({
         projectId,
@@ -91,17 +194,18 @@ router.post(
           : undefined,
         photos,
         signature,
+        status: "draft",
         createdBy: req.user.id,
       });
 
       await safetyObservation.save();
 
       res.status(201).json({
-        message: "Safety observation created successfully",
+        message: "Draft saved successfully",
         data: safetyObservation,
       });
     } catch (error) {
-      console.error("Error creating safety observation:", error);
+      console.error("Error saving safety observation draft:", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -117,7 +221,7 @@ router.get("/", auth, async (req, res) => {
       limit = 10,
       projectId,
       severity,
-      status = "open",
+      status,
       sortBy = "createdAt",
       sortOrder = "desc",
     } = req.query;
@@ -183,7 +287,7 @@ router.put(
     [
       body("status")
         .optional()
-        .isIn(["open", "in_progress", "closed", "cancelled"]),
+        .isIn(["draft", "open", "in_progress", "closed", "cancelled"]),
       body("assignedTo").optional().notEmpty(),
       body("closureNotes").optional().notEmpty(),
     ],
@@ -272,6 +376,7 @@ router.get("/stats/overview", auth, async (req, res) => {
         $group: {
           _id: null,
           total: { $sum: 1 },
+          draft: { $sum: { $cond: [{ $eq: ["$status", "draft"] }, 1, 0] } },
           open: { $sum: { $cond: [{ $eq: ["$status", "open"] }, 1, 0] } },
           inProgress: {
             $sum: { $cond: [{ $eq: ["$status", "in_progress"] }, 1, 0] },

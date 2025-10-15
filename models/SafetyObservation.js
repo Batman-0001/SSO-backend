@@ -71,8 +71,8 @@ const safetyObservationSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["open", "in_progress", "closed", "cancelled"],
-      default: "open",
+      enum: ["draft", "open", "in_progress", "closed", "cancelled"],
+      default: "draft",
     },
     assignedTo: {
       type: String,
@@ -120,21 +120,43 @@ safetyObservationSchema.methods.requiresCorrectiveAction = function () {
 
 // Pre-save validation
 safetyObservationSchema.pre("save", function (next) {
+  // Only validate required fields for non-draft status
+  if (this.status !== "draft") {
+    // Validate required fields for submitted observations
+    if (
+      !this.type ||
+      !this.location ||
+      !this.observedBy ||
+      !this.severity ||
+      !this.description ||
+      !this.actionOwner
+    ) {
+      return next(
+        new Error(
+          "All required fields must be filled for submitted observations"
+        )
+      );
+    }
+
+    // Validate description length
+    if (this.description.length < 10) {
+      return next(new Error("Description must be at least 10 characters"));
+    }
+
+    // Validate corrective action requirement
+    if (this.requiresCorrectiveAction() && !this.correctiveAction) {
+      return next(
+        new Error(
+          "Corrective action is required for Medium/High/Critical severity"
+        )
+      );
+    }
+  }
+
   // Validate photos array length
   if (this.photos && this.photos.length > 6) {
     return next(new Error("Maximum 6 photos allowed"));
   }
-
-  // Validate corrective action requirement
-  if (this.requiresCorrectiveAction() && !this.correctiveAction) {
-    return next(
-      new Error(
-        "Corrective action is required for Medium/High/Critical severity"
-      )
-    );
-  }
-
-  // Target closure date validation removed for testing flexibility
 
   next();
 });
