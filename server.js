@@ -53,6 +53,7 @@ app.use("/api/site-inspection", require("./routes/siteInspection"));
 app.use("/api/ppe-compliance", require("./routes/ppeCompliance"));
 app.use("/api/sic-meeting", require("./routes/sicMeeting"));
 app.use("/api/good-practice", require("./routes/goodPractice"));
+app.use("/api/end-of-day-report", require("./routes/endOfDayReport"));
 app.use("/api/upload", require("./routes/upload"));
 app.use("/api/csv-upload", require("./routes/csvUpload"));
 
