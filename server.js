@@ -37,6 +37,7 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/safety-observations", require("./routes/safetyObservations"));
 app.use("/api/induction-training", require("./routes/inductionTraining"));
 app.use("/api/daily-training", require("./routes/dailyTraining"));
+app.use("/api/daily-briefing", require("./routes/dailyBriefing"));
 app.use("/api/pep-talk", require("./routes/pepTalk"));
 app.use("/api/special-training", require("./routes/specialTraining"));
 app.use(
