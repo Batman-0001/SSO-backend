@@ -60,8 +60,8 @@ const safetyAdvisoryWarningSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ["active", "expired", "cancelled", "resolved"],
-      default: "active",
+      enum: ["draft", "active", "expired", "cancelled", "resolved"],
+      default: "draft",
     },
     acknowledgedBy: [
       {
@@ -162,8 +162,12 @@ safetyAdvisoryWarningSchema.methods.acknowledge = function (
 
 // Pre-save validation
 safetyAdvisoryWarningSchema.pre("save", function (next) {
-  // Validate validity dates
-  if (this.validityTo && this.validityTo <= this.validityFrom) {
+  // Validate validity dates only for non-draft status
+  if (
+    this.status !== "draft" &&
+    this.validityTo &&
+    this.validityTo <= this.validityFrom
+  ) {
     return next(
       new Error("Validity end date must be after validity start date")
     );

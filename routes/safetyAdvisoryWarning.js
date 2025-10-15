@@ -57,10 +57,15 @@ router.post(
         actionsRequired,
         owner,
         photos = [],
+        status = "active",
       } = req.body;
 
-      // Validate validity dates
-      if (validityTo && new Date(validityTo) <= new Date(validityFrom)) {
+      // Validate validity dates only for active status
+      if (
+        status === "active" &&
+        validityTo &&
+        new Date(validityTo) <= new Date(validityFrom)
+      ) {
         return res.status(400).json({
           message: "Validity end date must be after validity start date",
         });
@@ -78,17 +83,103 @@ router.post(
         actionsRequired,
         owner,
         photos,
+        status,
+        createdBy: req.user.id,
+      });
+
+      await safetyAdvisoryWarning.save();
+
+      let responseMessage =
+        status === "draft"
+          ? "Safety advisory warning saved as draft"
+          : "Safety advisory warning submitted successfully";
+
+      res.status(201).json({
+        message: responseMessage,
+        data: safetyAdvisoryWarning,
+        status,
+      });
+    } catch (error) {
+      console.error("Error creating safety advisory warning:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
+
+// @route   POST /api/safety-advisory-warning/save-draft
+// @desc    Save safety advisory warning as draft
+// @access  Private
+router.post(
+  "/save-draft",
+  [
+    auth,
+    [
+      body("projectId").notEmpty().withMessage("Project ID is required"),
+      body("date").isISO8601().withMessage("Valid date is required"),
+      body("warningTitle").notEmpty().withMessage("Warning title is required"),
+      body("severity")
+        .isIn(["low", "medium", "high", "critical"])
+        .withMessage("Invalid severity level"),
+      body("affectedArea").notEmpty().withMessage("Affected area is required"),
+      body("description").notEmpty().withMessage("Description is required"),
+      body("validityFrom")
+        .isISO8601()
+        .withMessage("Valid validity from date is required"),
+      body("validityTo")
+        .optional()
+        .isISO8601()
+        .withMessage("Valid validity to date is required"),
+      body("actionsRequired")
+        .notEmpty()
+        .withMessage("Actions required is required"),
+      body("owner").notEmpty().withMessage("Action owner is required"),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const {
+        projectId,
+        date,
+        warningTitle,
+        severity,
+        affectedArea,
+        description,
+        validityFrom,
+        validityTo,
+        actionsRequired,
+        owner,
+        photos = [],
+      } = req.body;
+
+      const safetyAdvisoryWarning = new SafetyAdvisoryWarning({
+        projectId,
+        date: new Date(date),
+        warningTitle,
+        severity,
+        affectedArea,
+        description,
+        validityFrom: new Date(validityFrom),
+        validityTo: validityTo ? new Date(validityTo) : undefined,
+        actionsRequired,
+        owner,
+        photos,
+        status: "draft",
         createdBy: req.user.id,
       });
 
       await safetyAdvisoryWarning.save();
 
       res.status(201).json({
-        message: "Safety advisory warning created successfully",
+        message: "Safety advisory warning saved as draft",
         data: safetyAdvisoryWarning,
       });
     } catch (error) {
-      console.error("Error creating safety advisory warning:", error);
+      console.error("Error saving safety advisory warning draft:", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -325,6 +416,9 @@ router.get("/stats/overview", auth, async (req, res) => {
         $group: {
           _id: null,
           total: { $sum: 1 },
+          draft: {
+            $sum: { $cond: [{ $eq: ["$status", "draft"] }, 1, 0] },
+          },
           active: {
             $sum: { $cond: [{ $eq: ["$status", "active"] }, 1, 0] },
           },
