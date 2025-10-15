@@ -68,8 +68,8 @@ const firstAidSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ["reported", "investigated", "closed"],
-      default: "reported",
+      enum: ["draft", "reported", "investigated", "closed"],
+      default: "draft",
     },
     investigationNotes: {
       type: String,
@@ -152,16 +152,32 @@ firstAidSchema.methods.scheduleFollowUp = function (followUpDate, notes = "") {
 
 // Pre-save validation
 firstAidSchema.pre("save", function (next) {
-  // Validate hospital transport requirements
-  if (
-    this.transportToHospital &&
-    (!this.hospitalName || this.hospitalName.trim().length === 0)
-  ) {
-    return next(
-      new Error(
-        "Hospital name is required when victim was transported to hospital"
-      )
-    );
+  // Only validate required fields for non-draft status
+  if (this.status !== "draft") {
+    // Validate required fields for submitted cases
+    if (
+      !this.victimName ||
+      !this.victimEmpId ||
+      !this.injuryType ||
+      !this.cause ||
+      !this.treatmentGiven
+    ) {
+      return next(
+        new Error("All required fields must be filled for submitted cases")
+      );
+    }
+
+    // Validate hospital transport requirements
+    if (
+      this.transportToHospital &&
+      (!this.hospitalName || this.hospitalName.trim().length === 0)
+    ) {
+      return next(
+        new Error(
+          "Hospital name is required when victim was transported to hospital"
+        )
+      );
+    }
   }
 
   // Filter out empty witness names

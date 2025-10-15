@@ -17,13 +17,21 @@ router.post(
       body("dateTime")
         .isISO8601()
         .withMessage("Valid date and time is required"),
-      body("victimName").notEmpty().withMessage("Victim name is required"),
+      body("victimName")
+        .optional()
+        .notEmpty()
+        .withMessage("Victim name is required"),
       body("victimEmpId")
+        .optional()
         .notEmpty()
         .withMessage("Victim employee ID is required"),
-      body("injuryType").notEmpty().withMessage("Injury type is required"),
-      body("cause").notEmpty().withMessage("Cause is required"),
+      body("injuryType")
+        .optional()
+        .notEmpty()
+        .withMessage("Injury type is required"),
+      body("cause").optional().notEmpty().withMessage("Cause is required"),
       body("treatmentGiven")
+        .optional()
         .notEmpty()
         .withMessage("Treatment given is required"),
       body("transportToHospital")
@@ -42,6 +50,10 @@ router.post(
         .optional()
         .isArray()
         .withMessage("Photos must be an array"),
+      body("status")
+        .optional()
+        .isIn(["draft", "reported"])
+        .withMessage("Status must be draft or reported"),
     ],
   ],
   async (req, res) => {
@@ -64,10 +76,21 @@ router.post(
         hospitalDetails = "",
         witnessNames = [],
         photos = [],
+        status = "draft",
       } = req.body;
 
-      // Validate hospital transport requirements
+      // Determine status based on completeness for automatic submission
+      let finalStatus = status;
       if (
+        status === "reported" ||
+        (victimName && victimEmpId && injuryType && cause && treatmentGiven)
+      ) {
+        finalStatus = "reported";
+      }
+
+      // Validate hospital transport requirements for reported cases
+      if (
+        finalStatus === "reported" &&
         transportToHospital &&
         (!hospitalName || hospitalName.trim().length === 0)
       ) {
@@ -76,6 +99,80 @@ router.post(
             "Hospital name is required when victim was transported to hospital",
         });
       }
+
+      // Filter out empty witness names
+      const validWitnessNames = witnessNames.filter(
+        (name) => name && name.trim().length > 0
+      );
+
+      const firstAid = new FirstAid({
+        projectId,
+        dateTime: new Date(dateTime),
+        victimName: victimName || "",
+        victimEmpId: victimEmpId || "",
+        injuryType: injuryType || "",
+        cause: cause || "",
+        treatmentGiven: treatmentGiven || "",
+        transportToHospital,
+        hospitalName,
+        hospitalDetails,
+        witnessNames: validWitnessNames,
+        photos,
+        status: finalStatus,
+        createdBy: req.user.id,
+      });
+
+      await firstAid.save();
+
+      res.status(201).json({
+        message:
+          finalStatus === "draft"
+            ? "First-aid case saved as draft"
+            : "First-aid case submitted successfully",
+        data: firstAid,
+      });
+    } catch (error) {
+      console.error("Error creating first-aid case:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
+
+// @route   POST /api/first-aid/save-draft
+// @desc    Save first-aid case as draft (minimal validation)
+// @access  Private
+router.post(
+  "/save-draft",
+  [
+    auth,
+    [
+      body("projectId").notEmpty().withMessage("Project ID is required"),
+      body("dateTime")
+        .isISO8601()
+        .withMessage("Valid date and time is required"),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const {
+        projectId,
+        dateTime,
+        victimName = "",
+        victimEmpId = "",
+        injuryType = "",
+        cause = "",
+        treatmentGiven = "",
+        transportToHospital = false,
+        hospitalName = "",
+        hospitalDetails = "",
+        witnessNames = [],
+        photos = [],
+      } = req.body;
 
       // Filter out empty witness names
       const validWitnessNames = witnessNames.filter(
@@ -95,17 +192,18 @@ router.post(
         hospitalDetails,
         witnessNames: validWitnessNames,
         photos,
+        status: "draft",
         createdBy: req.user.id,
       });
 
       await firstAid.save();
 
       res.status(201).json({
-        message: "First-aid case created successfully",
+        message: "Draft saved successfully",
         data: firstAid,
       });
     } catch (error) {
-      console.error("Error creating first-aid case:", error);
+      console.error("Error saving first-aid draft:", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -121,7 +219,7 @@ router.get("/", auth, async (req, res) => {
       limit = 10,
       projectId,
       injuryType,
-      status = "reported",
+      status,
       transportToHospital,
       victimEmpId,
       sortBy = "dateTime",
@@ -190,7 +288,9 @@ router.put(
   [
     auth,
     [
-      body("status").optional().isIn(["reported", "investigated", "closed"]),
+      body("status")
+        .optional()
+        .isIn(["draft", "reported", "investigated", "closed"]),
       body("transportToHospital")
         .optional()
         .isBoolean()
@@ -339,6 +439,9 @@ router.get("/stats/overview", auth, async (req, res) => {
         $group: {
           _id: null,
           total: { $sum: 1 },
+          draft: {
+            $sum: { $cond: [{ $eq: ["$status", "draft"] }, 1, 0] },
+          },
           reported: {
             $sum: { $cond: [{ $eq: ["$status", "reported"] }, 1, 0] },
           },
