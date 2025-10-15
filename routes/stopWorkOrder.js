@@ -64,6 +64,7 @@ router.post(
         immediateActions,
         photos = [],
         sicSignature,
+        status = "active",
       } = req.body;
 
       const stopWorkOrder = new StopWorkOrder({
@@ -78,17 +79,109 @@ router.post(
         immediateActions,
         photos,
         sicSignature,
+        status,
+        createdBy: req.user.id,
+      });
+
+      await stopWorkOrder.save();
+
+      let responseMessage =
+        status === "draft"
+          ? "Stop Work Order saved as draft"
+          : "Stop Work Order issued successfully";
+
+      res.status(201).json({
+        message: responseMessage,
+        data: stopWorkOrder,
+        status,
+      });
+    } catch (error) {
+      console.error("Error creating stop work order:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
+
+// @route   POST /api/stop-work-order/save-draft
+// @desc    Save stop work order as draft
+// @access  Private
+router.post(
+  "/save-draft",
+  [
+    auth,
+    [
+      body("projectId").notEmpty().withMessage("Project ID is required"),
+      body("dateTime")
+        .isISO8601()
+        .withMessage("Valid date and time is required"),
+      body("areaStopped").notEmpty().withMessage("Area stopped is required"),
+      body("activityStopped")
+        .notEmpty()
+        .withMessage("Activity stopped is required"),
+      body("reasonCategory")
+        .isIn([
+          "unsafe_condition",
+          "unsafe_act",
+          "equipment_failure",
+          "weather",
+          "regulatory",
+          "other",
+        ])
+        .withMessage("Invalid reason category"),
+      body("reasonDescription")
+        .notEmpty()
+        .withMessage("Reason description is required"),
+      body("issuedBy").notEmpty().withMessage("Issued by is required"),
+      body("immediateActions")
+        .notEmpty()
+        .withMessage("Immediate actions are required"),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const {
+        projectId,
+        dateTime,
+        areaStopped,
+        activityStopped,
+        reasonCategory,
+        reasonDescription,
+        issuedBy,
+        duration = "",
+        immediateActions,
+        photos = [],
+        sicSignature = "",
+      } = req.body;
+
+      const stopWorkOrder = new StopWorkOrder({
+        projectId,
+        dateTime: new Date(dateTime),
+        areaStopped,
+        activityStopped,
+        reasonCategory,
+        reasonDescription,
+        issuedBy,
+        duration,
+        immediateActions,
+        photos,
+        sicSignature,
+        status: "draft",
         createdBy: req.user.id,
       });
 
       await stopWorkOrder.save();
 
       res.status(201).json({
-        message: "Stop Work Order created successfully",
+        message: "Stop Work Order saved as draft",
         data: stopWorkOrder,
       });
     } catch (error) {
-      console.error("Error creating stop work order:", error);
+      console.error("Error saving stop work order draft:", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -292,6 +385,9 @@ router.get("/stats/overview", auth, async (req, res) => {
         $group: {
           _id: null,
           total: { $sum: 1 },
+          draft: {
+            $sum: { $cond: [{ $eq: ["$status", "draft"] }, 1, 0] },
+          },
           active: {
             $sum: { $cond: [{ $eq: ["$status", "active"] }, 1, 0] },
           },
