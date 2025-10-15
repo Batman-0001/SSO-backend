@@ -17,17 +17,26 @@ router.post(
       body("dateTime")
         .isISO8601()
         .withMessage("Valid date and time is required"),
-      body("location").notEmpty().withMessage("Location is required"),
+      body("location")
+        .optional()
+        .notEmpty()
+        .withMessage("Location is required"),
       body("situation")
+        .optional()
         .notEmpty()
         .withMessage("Situation description is required"),
       body("potentialConsequence")
+        .optional()
         .notEmpty()
         .withMessage("Potential consequence is required"),
       body("preventiveActions")
+        .optional()
         .notEmpty()
         .withMessage("Preventive actions are required"),
-      body("reportedBy").notEmpty().withMessage("Reported by is required"),
+      body("reportedBy")
+        .optional()
+        .notEmpty()
+        .withMessage("Reported by is required"),
       body("investigationRequired")
         .optional()
         .isBoolean()
@@ -40,6 +49,10 @@ router.post(
         .optional()
         .isArray()
         .withMessage("Photos must be an array"),
+      body("status")
+        .optional()
+        .isIn(["draft", "reported"])
+        .withMessage("Status must be draft or reported"),
     ],
   ],
   async (req, res) => {
@@ -60,6 +73,93 @@ router.post(
         investigationRequired = false,
         severity = "high",
         photos = [],
+        status = "draft",
+      } = req.body;
+
+      // Determine status based on completeness for automatic submission
+      let finalStatus = status;
+      if (
+        status === "reported" ||
+        (location &&
+          situation &&
+          potentialConsequence &&
+          preventiveActions &&
+          reportedBy)
+      ) {
+        finalStatus = "reported";
+      }
+
+      const dangerousOccurrence = new DangerousOccurrence({
+        projectId,
+        dateTime: new Date(dateTime),
+        location: location || "",
+        situation: situation || "",
+        potentialConsequence: potentialConsequence || "",
+        preventiveActions: preventiveActions || "",
+        reportedBy: reportedBy || "",
+        investigationRequired,
+        severity,
+        photos,
+        status: finalStatus,
+        createdBy: req.user.id,
+      });
+
+      await dangerousOccurrence.save();
+
+      // Auto-notify head office if investigation required
+      if (investigationRequired && finalStatus === "reported") {
+        dangerousOccurrence.notifyHeadOffice();
+        await dangerousOccurrence.save();
+      }
+
+      res.status(201).json({
+        message:
+          finalStatus === "draft"
+            ? "Dangerous occurrence saved as draft"
+            : investigationRequired
+            ? "Dangerous occurrence submitted successfully. Head Office has been notified."
+            : "Dangerous occurrence submitted successfully",
+        data: dangerousOccurrence,
+      });
+    } catch (error) {
+      console.error("Error creating dangerous occurrence:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
+
+// @route   POST /api/dangerous-occurrence/save-draft
+// @desc    Save dangerous occurrence report as draft (minimal validation)
+// @access  Private
+router.post(
+  "/save-draft",
+  [
+    auth,
+    [
+      body("projectId").notEmpty().withMessage("Project ID is required"),
+      body("dateTime")
+        .isISO8601()
+        .withMessage("Valid date and time is required"),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const {
+        projectId,
+        dateTime,
+        location = "",
+        situation = "",
+        potentialConsequence = "",
+        preventiveActions = "",
+        reportedBy = "",
+        investigationRequired = false,
+        severity = "high",
+        photos = [],
       } = req.body;
 
       const dangerousOccurrence = new DangerousOccurrence({
@@ -73,25 +173,18 @@ router.post(
         investigationRequired,
         severity,
         photos,
+        status: "draft",
         createdBy: req.user.id,
       });
 
       await dangerousOccurrence.save();
 
-      // Auto-notify head office if investigation required
-      if (investigationRequired) {
-        dangerousOccurrence.notifyHeadOffice();
-        await dangerousOccurrence.save();
-      }
-
       res.status(201).json({
-        message: investigationRequired
-          ? "Dangerous occurrence created successfully. Head Office has been notified."
-          : "Dangerous occurrence created successfully",
+        message: "Draft saved successfully",
         data: dangerousOccurrence,
       });
     } catch (error) {
-      console.error("Error creating dangerous occurrence:", error);
+      console.error("Error saving dangerous occurrence draft:", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -107,7 +200,7 @@ router.get("/", auth, async (req, res) => {
       limit = 10,
       projectId,
       severity,
-      status = "reported",
+      status,
       investigationRequired,
       headOfficeNotified,
       sortBy = "dateTime",
@@ -184,6 +277,7 @@ router.put(
       body("status")
         .optional()
         .isIn([
+          "draft",
           "reported",
           "under_investigation",
           "investigation_complete",
@@ -393,6 +487,9 @@ router.get("/stats/overview", auth, async (req, res) => {
         $group: {
           _id: null,
           total: { $sum: 1 },
+          draft: {
+            $sum: { $cond: [{ $eq: ["$status", "draft"] }, 1, 0] },
+          },
           reported: {
             $sum: { $cond: [{ $eq: ["$status", "reported"] }, 1, 0] },
           },

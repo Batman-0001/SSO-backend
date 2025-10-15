@@ -53,12 +53,13 @@ const dangerousOccurrenceSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: [
+        "draft",
         "reported",
         "under_investigation",
         "investigation_complete",
         "closed",
       ],
-      default: "reported",
+      default: "draft",
     },
     severity: {
       type: String,
@@ -259,6 +260,22 @@ dangerousOccurrenceSchema.methods.shareWithTeam = function () {
 
 // Pre-save validation
 dangerousOccurrenceSchema.pre("save", function (next) {
+  // Only validate required fields for non-draft status
+  if (this.status !== "draft") {
+    // Validate required fields for submitted reports
+    if (
+      !this.location ||
+      !this.situation ||
+      !this.potentialConsequence ||
+      !this.preventiveActions ||
+      !this.reportedBy
+    ) {
+      return next(
+        new Error("All required fields must be filled for submitted reports")
+      );
+    }
+  }
+
   // Auto-notify head office if investigation required
   if (this.investigationRequired && !this.headOfficeNotified) {
     this.notifyHeadOffice();
