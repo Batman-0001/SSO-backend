@@ -49,6 +49,7 @@ app.use("/api/stop-work-order", require("./routes/stopWorkOrder"));
 app.use("/api/first-aid", require("./routes/firstAid"));
 app.use("/api/near-miss", require("./routes/nearMiss"));
 app.use("/api/dangerous-occurrence", require("./routes/dangerousOccurrence"));
+app.use("/api/site-inspection", require("./routes/siteInspection"));
 app.use("/api/sic-meeting", require("./routes/sicMeeting"));
 app.use("/api/good-practice", require("./routes/goodPractice"));
 app.use("/api/upload", require("./routes/upload"));
