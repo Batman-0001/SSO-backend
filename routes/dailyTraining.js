@@ -15,22 +15,35 @@ router.post(
     [
       body("projectId").notEmpty().withMessage("Project ID is required"),
       body("date").isISO8601().withMessage("Valid training date is required"),
-      body("topic").notEmpty().withMessage("Topic is required"),
+      body("topic").optional().notEmpty().withMessage("Topic is required"),
       body("duration")
+        .optional()
         .isInt({ min: 1 })
         .withMessage("Duration must be at least 1 minute"),
-      body("trainer").notEmpty().withMessage("Trainer name is required"),
+      body("trainer")
+        .optional()
+        .notEmpty()
+        .withMessage("Trainer name is required"),
       body("attendeesCount")
+        .optional()
         .isInt({ min: 0 })
         .withMessage("Attendees count must be a non-negative number"),
       body("keyPoints")
-        .isArray({ min: 1 })
-        .withMessage("At least one key point is required"),
-      body("keyPoints.*").notEmpty().withMessage("Key points cannot be empty"),
+        .optional()
+        .isArray()
+        .withMessage("Key points must be an array"),
+      body("keyPoints.*")
+        .optional()
+        .notEmpty()
+        .withMessage("Key points cannot be empty"),
       body("photos")
         .optional()
         .isArray()
         .withMessage("Photos must be an array"),
+      body("status")
+        .optional()
+        .isIn(["draft", "scheduled", "completed"])
+        .withMessage("Status must be draft, scheduled, or completed"),
     ],
   ],
   async (req, res) => {
@@ -49,14 +62,25 @@ router.post(
         attendeesCount,
         keyPoints = [],
         photos = [],
+        status = "draft",
       } = req.body;
+
+      // Determine status based on completeness for automatic submission
+      let finalStatus = status;
+      if (
+        status === "completed" ||
+        (topic && duration && trainer && attendeesCount)
+      ) {
+        finalStatus = "completed";
+      }
 
       // Filter out empty key points
       const validKeyPoints = keyPoints.filter(
         (point) => point && point.trim().length > 0
       );
 
-      if (validKeyPoints.length === 0) {
+      // Validate key points for submitted trainings
+      if (finalStatus === "completed" && validKeyPoints.length === 0) {
         return res.status(400).json({
           message: "At least one valid key point is required",
         });
@@ -65,23 +89,83 @@ router.post(
       const dailyTraining = new DailyTraining({
         projectId,
         date: new Date(date),
-        topic,
-        duration,
-        trainer,
-        attendeesCount,
+        topic: topic || "",
+        duration: duration || 0,
+        trainer: trainer || "",
+        attendeesCount: attendeesCount || 0,
         keyPoints: validKeyPoints,
         photos,
+        status: finalStatus,
         createdBy: req.user.id,
       });
 
       await dailyTraining.save();
 
       res.status(201).json({
-        message: "Daily training created successfully",
+        message:
+          finalStatus === "draft"
+            ? "Daily training saved as draft"
+            : "Daily training submitted successfully",
         data: dailyTraining,
       });
     } catch (error) {
       console.error("Error creating daily training:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
+
+// @route   POST /api/daily-training/save-draft
+// @desc    Save daily training as draft (minimal validation)
+// @access  Private
+router.post(
+  "/save-draft",
+  [
+    auth,
+    [
+      body("projectId").notEmpty().withMessage("Project ID is required"),
+      body("date").isISO8601().withMessage("Valid training date is required"),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const {
+        projectId,
+        date,
+        topic = "",
+        duration = 0,
+        trainer = "",
+        attendeesCount = 0,
+        keyPoints = [],
+        photos = [],
+      } = req.body;
+
+      const dailyTraining = new DailyTraining({
+        projectId,
+        date: new Date(date),
+        topic,
+        duration,
+        trainer,
+        attendeesCount,
+        keyPoints,
+        photos,
+        status: "draft",
+        createdBy: req.user.id,
+      });
+
+      await dailyTraining.save();
+
+      res.status(201).json({
+        message: "Draft saved successfully",
+        data: dailyTraining,
+      });
+    } catch (error) {
+      console.error("Error saving daily training draft:", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -98,7 +182,7 @@ router.get("/", auth, async (req, res) => {
       projectId,
       topic,
       trainer,
-      status = "completed",
+      status,
       sortBy = "date",
       sortOrder = "desc",
     } = req.query;
@@ -163,7 +247,9 @@ router.put(
   [
     auth,
     [
-      body("status").optional().isIn(["scheduled", "completed", "cancelled"]),
+      body("status")
+        .optional()
+        .isIn(["draft", "scheduled", "completed", "cancelled"]),
       body("duration")
         .optional()
         .isInt({ min: 1 })
@@ -276,6 +362,9 @@ router.get("/stats/overview", auth, async (req, res) => {
         $group: {
           _id: null,
           total: { $sum: 1 },
+          draft: {
+            $sum: { $cond: [{ $eq: ["$status", "draft"] }, 1, 0] },
+          },
           scheduled: {
             $sum: { $cond: [{ $eq: ["$status", "scheduled"] }, 1, 0] },
           },

@@ -55,8 +55,8 @@ const dailyTrainingSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ["scheduled", "completed", "cancelled"],
-      default: "completed",
+      enum: ["draft", "scheduled", "completed", "cancelled"],
+      default: "draft",
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -100,16 +100,33 @@ dailyTrainingSchema.pre("save", function (next) {
     (point) => point && point.trim().length > 0
   );
 
-  // Validate that we have at least one key point
-  if (this.keyPoints.length === 0) {
-    return next(new Error("At least one key point is required"));
-  }
+  // Only validate required fields for non-draft status
+  if (this.status !== "draft") {
+    // Validate required fields for submitted trainings
+    if (
+      !this.topic ||
+      !this.duration ||
+      !this.trainer ||
+      !this.attendeesCount
+    ) {
+      return next(
+        new Error("All required fields must be filled for submitted trainings")
+      );
+    }
 
-  // Validate training date is not in the future for completed trainings
-  if (this.status === "completed" && this.date > new Date()) {
-    return next(
-      new Error("Training date cannot be in the future for completed trainings")
-    );
+    // Validate that we have at least one key point
+    if (this.keyPoints.length === 0) {
+      return next(new Error("At least one key point is required"));
+    }
+
+    // Validate training date is not in the future for completed trainings
+    if (this.status === "completed" && this.date > new Date()) {
+      return next(
+        new Error(
+          "Training date cannot be in the future for completed trainings"
+        )
+      );
+    }
   }
 
   next();
