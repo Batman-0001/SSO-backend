@@ -18,17 +18,29 @@ router.post(
         .isISO8601()
         .withMessage("Valid training date is required"),
       body("duration")
+        .optional()
         .isInt({ min: 1 })
         .withMessage("Duration must be at least 1 minute"),
-      body("trainerName").notEmpty().withMessage("Trainer name is required"),
+      body("trainerName")
+        .optional()
+        .notEmpty()
+        .withMessage("Trainer name is required"),
       body("attendanceCount")
+        .optional()
         .isInt({ min: 0 })
         .withMessage("Attendance count must be a non-negative number"),
-      body("attendees").isArray().withMessage("Attendees must be an array"),
+      body("attendees")
+        .optional()
+        .isArray()
+        .withMessage("Attendees must be an array"),
       body("photos")
         .optional()
         .isArray()
         .withMessage("Photos must be an array"),
+      body("status")
+        .optional()
+        .isIn(["draft", "scheduled", "completed"])
+        .withMessage("Status must be draft, scheduled, or completed"),
     ],
   ],
   async (req, res) => {
@@ -48,15 +60,88 @@ router.post(
         attendees = [],
         notes = "",
         photos = [],
+        status = "draft",
       } = req.body;
 
-      // Validate attendance count matches attendees array
-      if (attendanceCount !== attendees.length) {
+      // Determine status based on completeness for automatic submission
+      let finalStatus = status;
+      if (
+        status === "completed" ||
+        (duration && trainerName && attendanceCount)
+      ) {
+        finalStatus = "completed";
+      }
+
+      // Validate attendance count matches attendees array for submitted trainings
+      if (finalStatus === "completed" && attendanceCount !== attendees.length) {
         return res.status(400).json({
           message:
             "Attendance count must match the number of attendees in the list",
         });
       }
+
+      const inductionTraining = new InductionTraining({
+        projectId,
+        trainingDate: new Date(trainingDate),
+        duration: duration || 0,
+        contractor: contractor || "",
+        trainerName: trainerName || "",
+        attendanceCount: attendanceCount || 0,
+        attendees,
+        notes: notes || "",
+        photos,
+        status: finalStatus,
+        createdBy: req.user.id,
+      });
+
+      await inductionTraining.save();
+
+      res.status(201).json({
+        message:
+          finalStatus === "draft"
+            ? "Induction training saved as draft"
+            : "Induction training submitted successfully",
+        data: inductionTraining,
+      });
+    } catch (error) {
+      console.error("Error creating induction training:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
+
+// @route   POST /api/induction-training/save-draft
+// @desc    Save induction training as draft (minimal validation)
+// @access  Private
+router.post(
+  "/save-draft",
+  [
+    auth,
+    [
+      body("projectId").notEmpty().withMessage("Project ID is required"),
+      body("trainingDate")
+        .isISO8601()
+        .withMessage("Valid training date is required"),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const {
+        projectId,
+        trainingDate,
+        duration = 0,
+        contractor = "",
+        trainerName = "",
+        attendanceCount = 0,
+        attendees = [],
+        notes = "",
+        photos = [],
+      } = req.body;
 
       const inductionTraining = new InductionTraining({
         projectId,
@@ -68,17 +153,18 @@ router.post(
         attendees,
         notes,
         photos,
+        status: "draft",
         createdBy: req.user.id,
       });
 
       await inductionTraining.save();
 
       res.status(201).json({
-        message: "Induction training created successfully",
+        message: "Draft saved successfully",
         data: inductionTraining,
       });
     } catch (error) {
-      console.error("Error creating induction training:", error);
+      console.error("Error saving induction training draft:", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -95,7 +181,7 @@ router.get("/", auth, async (req, res) => {
       projectId,
       contractor,
       trainerName,
-      status = "completed",
+      status,
       sortBy = "trainingDate",
       sortOrder = "desc",
     } = req.query;
@@ -160,7 +246,9 @@ router.put(
   [
     auth,
     [
-      body("status").optional().isIn(["scheduled", "completed", "cancelled"]),
+      body("status")
+        .optional()
+        .isIn(["draft", "scheduled", "completed", "cancelled"]),
       body("duration")
         .optional()
         .isInt({ min: 1 })
@@ -261,6 +349,9 @@ router.get("/stats/overview", auth, async (req, res) => {
         $group: {
           _id: null,
           total: { $sum: 1 },
+          draft: {
+            $sum: { $cond: [{ $eq: ["$status", "draft"] }, 1, 0] },
+          },
           scheduled: {
             $sum: { $cond: [{ $eq: ["$status", "scheduled"] }, 1, 0] },
           },

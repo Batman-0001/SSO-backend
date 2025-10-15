@@ -67,8 +67,8 @@ const inductionTrainingSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ["scheduled", "completed", "cancelled"],
-      default: "completed",
+      enum: ["draft", "scheduled", "completed", "cancelled"],
+      default: "draft",
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -102,20 +102,37 @@ inductionTrainingSchema.methods.validateAttendance = function () {
 
 // Pre-save validation
 inductionTrainingSchema.pre("save", function (next) {
-  // Validate attendance count matches attendees array
-  if (this.attendanceCount !== this.attendees.length) {
-    return next(
-      new Error(
-        "Attendance count must match the number of attendees in the list"
-      )
-    );
-  }
+  // Only validate required fields for non-draft status
+  if (this.status !== "draft") {
+    // Validate required fields for submitted trainings
+    if (
+      !this.trainingDate ||
+      !this.duration ||
+      !this.trainerName ||
+      !this.attendanceCount
+    ) {
+      return next(
+        new Error("All required fields must be filled for submitted trainings")
+      );
+    }
 
-  // Validate training date is not in the future for completed trainings
-  if (this.status === "completed" && this.trainingDate > new Date()) {
-    return next(
-      new Error("Training date cannot be in the future for completed trainings")
-    );
+    // Validate attendance count matches attendees array
+    if (this.attendanceCount !== this.attendees.length) {
+      return next(
+        new Error(
+          "Attendance count must match the number of attendees in the list"
+        )
+      );
+    }
+
+    // Validate training date is not in the future for completed trainings
+    if (this.status === "completed" && this.trainingDate > new Date()) {
+      return next(
+        new Error(
+          "Training date cannot be in the future for completed trainings"
+        )
+      );
+    }
   }
 
   next();
