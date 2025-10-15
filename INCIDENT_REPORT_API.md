@@ -105,11 +105,81 @@ Quickly captures essential incident information (minimal data for immediate capt
     "incidentId": "INC-2025-0001",
     "status": "draft"
     // ... minimal fields
+  },
+  "priority": "normal"
+}
+```
+
+**High Priority Response:**
+
+```json
+{
+  "message": "Incident captured! Complete details when ready. High-priority incident - management has been notified.",
+  "data": {
+    "_id": "...",
+    "incidentId": "INC-2025-0001",
+    "status": "draft"
+    // ... minimal fields
+  },
+  "priority": "high"
+}
+```
+
+### 3. Save Draft Incident Report
+
+**POST** `/api/incident-report/save-draft`
+
+Saves an incident report as draft from any tab (Details, Persons, Analysis).
+
+**Request Body:**
+
+```json
+{
+  "incidentId": "INC-2025-0001",
+  "dateTime": "2025-01-15T10:30:00.000Z",
+  "location": "Zone A - Construction Site",
+  "incidentType": "near_miss",
+  "severity": "medium",
+  "quickPhotos": ["cloudinary-url-1"],
+  "description": "Partial description...",
+  "activity": "Scaffolding work",
+  "equipment": "Safety harness",
+  "weather": "Partly Cloudy, 28°C",
+  "photos": ["cloudinary-url-1"],
+  "personName": "John Doe",
+  "personRole": "Mason",
+  "personCompany": "MEIL",
+  "injuryDetails": "Minor bruise",
+  "treatment": "First aid applied",
+  "witnessName": "Jane Smith",
+  "witnessStatement": "Partial witness statement...",
+  "immediateCause": "Slippery surface",
+  "rootCause": "Inadequate safety measures",
+  "immediateActions": "Worker moved to safe area",
+  "correctiveActions": "Safety briefing conducted"
+}
+```
+
+**Response:**
+
+```json
+{
+  "message": "Incident report saved as draft",
+  "data": {
+    "_id": "...",
+    "incidentId": "INC-2025-0001",
+    "status": "draft",
+    "dateTime": "2025-01-15T10:30:00.000Z",
+    "location": "Zone A - Construction Site",
+    "incidentType": "near_miss",
+    "severity": "medium",
+    "createdAt": "2025-01-15T10:30:00.000Z",
+    "createdBy": "user-id"
   }
 }
 ```
 
-### 3. Get All Incident Reports
+### 4. Get All Incident Reports
 
 **GET** `/api/incident-report`
 

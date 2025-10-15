@@ -111,13 +111,19 @@ router.post(
         );
       }
 
+      let responseMessage =
+        finalStatus === "draft"
+          ? "Incident report saved as draft"
+          : `✓ Incident Report Submitted\nIncident ID: ${incidentId}\nStatus: Under Investigation`;
+
       res.status(201).json({
-        message: "Incident report created successfully",
+        message: responseMessage,
         data: incidentReport,
         isHighPriority,
         alertMessage: isHighPriority
           ? "🚨 SMS alert sent to HO Middle Management"
           : null,
+        status: finalStatus,
       });
     } catch (error) {
       console.error("Error creating incident report:", error);
@@ -193,12 +199,130 @@ router.post(
 
       await incidentReport.save();
 
+      // Send high-priority alert for critical incidents
+      let alertMessage = "Incident captured! Complete details when ready.";
+      let priority = "normal";
+
+      if (severity === "high" || incidentType === "lti") {
+        alertMessage +=
+          " High-priority incident - management has been notified.";
+        priority = "high";
+      }
+
       res.status(201).json({
-        message: "Incident captured! Complete details when ready.",
+        message: alertMessage,
         data: incidentReport,
+        priority,
       });
     } catch (error) {
       console.error("Error quick saving incident report:", error);
+
+      if (error.code === 11000) {
+        return res.status(400).json({
+          message: "Incident ID already exists",
+        });
+      }
+
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
+
+// @route   POST /api/incident-report/save-draft
+// @desc    Save incident report as draft (from any tab)
+// @access  Private
+router.post(
+  "/save-draft",
+  [
+    auth,
+    [
+      body("incidentId").notEmpty().withMessage("Incident ID is required"),
+      body("dateTime")
+        .isISO8601()
+        .withMessage("Valid date and time is required"),
+      body("location").notEmpty().withMessage("Location is required"),
+      body("incidentType")
+        .isIn([
+          "near_miss",
+          "first_aid",
+          "medical",
+          "lti",
+          "property",
+          "environmental",
+        ])
+        .withMessage("Valid incident type is required"),
+      body("severity")
+        .isIn(["low", "medium", "high"])
+        .withMessage("Valid severity level is required"),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const {
+        incidentId,
+        dateTime,
+        location,
+        incidentType,
+        severity,
+        quickPhotos,
+        description = "",
+        activity = "",
+        equipment = "",
+        weather = "Partly Cloudy, 28°C",
+        photos = [],
+        personName = "",
+        personRole = "",
+        personCompany = "",
+        injuryDetails = "",
+        treatment = "",
+        witnessName = "",
+        witnessStatement = "",
+        immediateCause = "",
+        rootCause = "",
+        immediateActions = "",
+        correctiveActions = "",
+      } = req.body;
+
+      const incidentReport = new IncidentReport({
+        incidentId,
+        dateTime: new Date(dateTime),
+        location,
+        incidentType,
+        severity,
+        quickPhotos: quickPhotos || [],
+        description,
+        activity,
+        equipment,
+        weather,
+        photos,
+        personName,
+        personRole,
+        personCompany,
+        injuryDetails,
+        treatment,
+        witnessName,
+        witnessStatement,
+        immediateCause,
+        rootCause,
+        immediateActions,
+        correctiveActions,
+        status: "draft",
+        createdBy: req.user.id,
+      });
+
+      await incidentReport.save();
+
+      res.status(201).json({
+        message: "Incident report saved as draft",
+        data: incidentReport,
+      });
+    } catch (error) {
+      console.error("Error saving incident draft:", error);
 
       if (error.code === 11000) {
         return res.status(400).json({
