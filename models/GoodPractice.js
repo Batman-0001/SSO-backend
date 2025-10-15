@@ -18,12 +18,16 @@ const goodPracticeSchema = new mongoose.Schema(
     },
     title: {
       type: String,
-      required: true,
+      required: function () {
+        return this.status !== "draft";
+      },
       trim: true,
     },
     description: {
       type: String,
-      required: true,
+      required: function () {
+        return this.status !== "draft";
+      },
       trim: true,
     },
     awardable: {
@@ -42,8 +46,15 @@ const goodPracticeSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ["submitted", "under_review", "approved", "awarded", "rejected"],
-      default: "submitted",
+      enum: [
+        "draft",
+        "submitted",
+        "under_review",
+        "approved",
+        "awarded",
+        "rejected",
+      ],
+      default: "draft",
     },
     category: {
       type: String,

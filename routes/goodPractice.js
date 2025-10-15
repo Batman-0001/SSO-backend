@@ -61,6 +61,7 @@ router.post(
         category = "safety",
         impactLevel = "local",
         tags = [],
+        status = "submitted",
       } = req.body;
 
       // Filter out empty tags
@@ -77,17 +78,111 @@ router.post(
         category,
         impactLevel,
         tags: validTags,
+        status,
+        createdBy: req.user.id,
+      });
+
+      await goodPractice.save();
+
+      let responseMessage =
+        status === "draft"
+          ? "Good practice saved as draft"
+          : "Good practice submitted successfully";
+
+      res.status(201).json({
+        message: responseMessage,
+        data: goodPractice,
+        status,
+      });
+    } catch (error) {
+      console.error("Error creating good practice:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
+
+// @route   POST /api/good-practice/save-draft
+// @desc    Save good practice as draft
+// @access  Private
+router.post(
+  "/save-draft",
+  [
+    auth,
+    [
+      body("projectId").notEmpty().withMessage("Project ID is required"),
+      body("date").isISO8601().withMessage("Valid date is required"),
+      body("awardable")
+        .optional()
+        .isBoolean()
+        .withMessage("Awardable must be a boolean"),
+      body("category")
+        .optional()
+        .isIn([
+          "safety",
+          "environmental",
+          "efficiency",
+          "innovation",
+          "teamwork",
+          "leadership",
+        ])
+        .withMessage("Invalid category"),
+      body("impactLevel")
+        .optional()
+        .isIn(["local", "project_wide", "company_wide", "industry_wide"])
+        .withMessage("Invalid impact level"),
+      body("photos")
+        .optional()
+        .isArray()
+        .withMessage("Photos must be an array"),
+      body("tags").optional().isArray().withMessage("Tags must be an array"),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const {
+        projectId,
+        date,
+        title = "",
+        description = "",
+        awardable = false,
+        personsCredited = "",
+        photos = [],
+        category = "safety",
+        impactLevel = "local",
+        tags = [],
+      } = req.body;
+
+      // Filter out empty tags
+      const validTags = tags.filter((tag) => tag && tag.trim().length > 0);
+
+      const goodPractice = new GoodPractice({
+        projectId,
+        date: new Date(date),
+        title,
+        description,
+        awardable,
+        personsCredited,
+        photos,
+        category,
+        impactLevel,
+        tags: validTags,
+        status: "draft",
         createdBy: req.user.id,
       });
 
       await goodPractice.save();
 
       res.status(201).json({
-        message: "Good practice created successfully",
+        message: "Good practice saved as draft",
         data: goodPractice,
       });
     } catch (error) {
-      console.error("Error creating good practice:", error);
+      console.error("Error saving good practice draft:", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -103,7 +198,7 @@ router.get("/", auth, async (req, res) => {
       limit = 10,
       projectId,
       category,
-      status = "submitted",
+      status,
       awardable,
       impactLevel,
       sortBy = "date",
@@ -358,6 +453,9 @@ router.get("/stats/overview", auth, async (req, res) => {
         $group: {
           _id: null,
           total: { $sum: 1 },
+          draft: {
+            $sum: { $cond: [{ $eq: ["$status", "draft"] }, 1, 0] },
+          },
           submitted: {
             $sum: { $cond: [{ $eq: ["$status", "submitted"] }, 1, 0] },
           },
