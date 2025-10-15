@@ -49,6 +49,7 @@ router.post(
         attendeesCount,
         keyPoints = [],
         photos = [],
+        status = "completed",
       } = req.body;
 
       // Filter out empty key points
@@ -56,10 +57,10 @@ router.post(
         (point) => point && point.trim().length > 0
       );
 
+      // Determine final status based on completeness
+      let finalStatus = status;
       if (validKeyPoints.length === 0) {
-        return res.status(400).json({
-          message: "At least one valid key point is required",
-        });
+        finalStatus = "draft";
       }
 
       const pepTalk = new PEPTalk({
@@ -71,17 +72,93 @@ router.post(
         attendeesCount,
         keyPoints: validKeyPoints,
         photos,
+        status: finalStatus,
+        createdBy: req.user.id,
+      });
+
+      await pepTalk.save();
+
+      let responseMessage =
+        finalStatus === "draft"
+          ? "PEP talk saved as draft"
+          : "PEP talk submitted successfully";
+
+      res.status(201).json({
+        message: responseMessage,
+        data: pepTalk,
+        status: finalStatus,
+      });
+    } catch (error) {
+      console.error("Error creating PEP talk:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
+
+// @route   POST /api/pep-talk/save-draft
+// @desc    Save PEP talk as draft
+// @access  Private
+router.post(
+  "/save-draft",
+  [
+    auth,
+    [
+      body("projectId").notEmpty().withMessage("Project ID is required"),
+      body("date").isISO8601().withMessage("Valid PEP talk date is required"),
+      body("topic").notEmpty().withMessage("Topic is required"),
+      body("duration")
+        .isInt({ min: 1 })
+        .withMessage("Duration must be at least 1 minute"),
+      body("trainer").notEmpty().withMessage("Trainer name is required"),
+      body("attendeesCount")
+        .isInt({ min: 0 })
+        .withMessage("Attendees count must be a non-negative number"),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const {
+        projectId,
+        date,
+        topic,
+        duration,
+        trainer,
+        attendeesCount,
+        keyPoints = [],
+        photos = [],
+      } = req.body;
+
+      // Filter out empty key points
+      const validKeyPoints = keyPoints.filter(
+        (point) => point && point.trim().length > 0
+      );
+
+      const pepTalk = new PEPTalk({
+        projectId,
+        date: new Date(date),
+        topic,
+        duration,
+        trainer,
+        attendeesCount,
+        keyPoints: validKeyPoints,
+        photos,
+        status: "draft",
         createdBy: req.user.id,
       });
 
       await pepTalk.save();
 
       res.status(201).json({
-        message: "PEP talk created successfully",
+        message: "PEP talk saved as draft",
         data: pepTalk,
       });
     } catch (error) {
-      console.error("Error creating PEP talk:", error);
+      console.error("Error saving PEP talk draft:", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -275,6 +352,9 @@ router.get("/stats/overview", auth, async (req, res) => {
         $group: {
           _id: null,
           total: { $sum: 1 },
+          draft: {
+            $sum: { $cond: [{ $eq: ["$status", "draft"] }, 1, 0] },
+          },
           scheduled: {
             $sum: { $cond: [{ $eq: ["$status", "scheduled"] }, 1, 0] },
           },
