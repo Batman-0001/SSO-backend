@@ -20,17 +20,23 @@ const sicMeetingSchema = new mongoose.Schema(
       {
         name: {
           type: String,
-          required: true,
+          required: function () {
+            return this.status !== "draft";
+          },
           trim: true,
         },
         empId: {
           type: String,
-          required: true,
+          required: function () {
+            return this.status !== "draft";
+          },
           trim: true,
         },
         contractor: {
           type: String,
-          required: true,
+          required: function () {
+            return this.status !== "draft";
+          },
           trim: true,
         },
       },
@@ -43,7 +49,9 @@ const sicMeetingSchema = new mongoose.Schema(
     ],
     decisions: {
       type: String,
-      required: true,
+      required: function () {
+        return this.status !== "draft";
+      },
       trim: true,
     },
     actionOwners: {
@@ -58,13 +66,15 @@ const sicMeetingSchema = new mongoose.Schema(
     ],
     sicSignature: {
       type: String,
-      required: true,
+      required: function () {
+        return this.status !== "draft";
+      },
       trim: true,
     },
     status: {
       type: String,
       enum: ["draft", "completed", "archived"],
-      default: "completed",
+      default: "draft",
     },
     meetingDuration: {
       type: Number, // in minutes

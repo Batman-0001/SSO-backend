@@ -55,6 +55,7 @@ router.post(
         followUpRequired = false,
         followUpNotes = "",
         actionItems = [],
+        status = "completed",
       } = req.body;
 
       // Filter out empty agenda points
@@ -62,8 +63,8 @@ router.post(
         (point) => point && point.trim().length > 0
       );
 
-      // Validate attendees
-      if (!attendees || attendees.length === 0) {
+      // Validate attendees only for completed status
+      if (status === "completed" && (!attendees || attendees.length === 0)) {
         return res.status(400).json({
           message: "At least one attendee is required",
         });
@@ -101,17 +102,95 @@ router.post(
         followUpRequired,
         followUpNotes,
         actionItems,
+        status,
+        createdBy: req.user.id,
+      });
+
+      await sicMeeting.save();
+
+      let responseMessage =
+        status === "draft"
+          ? "SIC meeting saved as draft"
+          : "SIC meeting submitted successfully";
+
+      res.status(201).json({
+        message: responseMessage,
+        data: sicMeeting,
+        status,
+      });
+    } catch (error) {
+      console.error("Error creating SIC meeting:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
+
+// @route   POST /api/sic-meeting/save-draft
+// @desc    Save SIC meeting as draft
+// @access  Private
+router.post(
+  "/save-draft",
+  [
+    auth,
+    [
+      body("projectId").notEmpty().withMessage("Project ID is required"),
+      body("meetingDateTime")
+        .isISO8601()
+        .withMessage("Valid meeting date and time is required"),
+      body("agendaPoints")
+        .optional()
+        .isArray()
+        .withMessage("Agenda points must be an array"),
+      body("photos")
+        .optional()
+        .isArray()
+        .withMessage("Photos must be an array"),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const {
+        projectId,
+        meetingDateTime,
+        attendees = [],
+        agendaPoints = [],
+        decisions = "",
+        actionOwners = "",
+        photos = [],
+        sicSignature = "",
+      } = req.body;
+
+      // Filter out empty agenda points
+      const validAgendaPoints = agendaPoints.filter(
+        (point) => point && point.trim().length > 0
+      );
+
+      const sicMeeting = new SICMeeting({
+        projectId,
+        meetingDateTime: new Date(meetingDateTime),
+        attendees,
+        agendaPoints: validAgendaPoints,
+        decisions,
+        actionOwners,
+        photos,
+        sicSignature,
+        status: "draft",
         createdBy: req.user.id,
       });
 
       await sicMeeting.save();
 
       res.status(201).json({
-        message: "SIC meeting created successfully",
+        message: "SIC meeting saved as draft",
         data: sicMeeting,
       });
     } catch (error) {
-      console.error("Error creating SIC meeting:", error);
+      console.error("Error saving SIC meeting draft:", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -127,7 +206,7 @@ router.get("/", auth, async (req, res) => {
       limit = 10,
       projectId,
       meetingType,
-      status = "completed",
+      status,
       sortBy = "meetingDateTime",
       sortOrder = "desc",
     } = req.query;
