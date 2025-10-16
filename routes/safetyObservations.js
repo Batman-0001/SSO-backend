@@ -75,7 +75,6 @@ router.post(
         actionOwner,
         targetClosureDate,
         photos = [],
-        signature = "",
         status = "draft",
       } = req.body;
 
@@ -120,7 +119,6 @@ router.post(
           ? new Date(targetClosureDate)
           : undefined,
         photos,
-        signature,
         status: finalStatus,
         createdBy: req.user.id,
       });
@@ -175,7 +173,6 @@ router.post(
         actionOwner = "",
         targetClosureDate,
         photos = [],
-        signature = "",
       } = req.body;
 
       const safetyObservation = new SafetyObservation({
@@ -193,7 +190,6 @@ router.post(
           ? new Date(targetClosureDate)
           : undefined,
         photos,
-        signature,
         status: "draft",
         createdBy: req.user.id,
       });

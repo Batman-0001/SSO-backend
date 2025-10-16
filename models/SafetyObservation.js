@@ -65,10 +65,6 @@ const safetyObservationSchema = new mongoose.Schema(
         type: String, // Cloudinary URLs
       },
     ],
-    signature: {
-      type: String, // Base64 signature or Cloudinary URL
-      default: "",
-    },
     status: {
       type: String,
       enum: ["draft", "open", "in_progress", "closed", "cancelled"],

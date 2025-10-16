@@ -17,10 +17,11 @@ router.post(
     body("password")
       .isLength({ min: 6 })
       .withMessage("Password must be at least 6 characters"),
-    body("employeeId").notEmpty().withMessage("Employee ID is required"),
     body("role")
       .optional()
       .isIn(["sso", "hom", "tom"]),
+    body("projectId").optional().notEmpty().withMessage("Project ID is required"),
+    body("projectName").optional().notEmpty().withMessage("Project name is required"),
   ],
   async (req, res) => {
     try {
@@ -33,11 +34,34 @@ router.post(
         name,
         email,
         password,
-        employeeId,
         role = "employee",
         department,
         phone,
+        projectId,
+        projectName,
       } = req.body;
+
+      if (role === "sso" && (!projectId || !projectName)) {
+        return res.status(400).json({ message: "Project ID and Project Name are required for SSO role" });
+      }
+
+      let employeeId;
+      if (['sso', 'hom', 'tom'].includes(role)) {
+        const prefix = role.toUpperCase();
+        const lastUser = await User.findOne({ employeeId: new RegExp(`^${prefix}`) }).sort({ employeeId: -1 });
+        let nextNumber = 1;
+        if (lastUser) {
+          const lastNumStr = lastUser.employeeId.slice(prefix.length);
+          const lastNum = parseInt(lastNumStr, 10);
+          nextNumber = lastNum + 1;
+        }
+        employeeId = `${prefix}${nextNumber.toString().padStart(4, '0')}`;
+      } else {
+        if (!req.body.employeeId) {
+          return res.status(400).json({ message: "Employee ID is required" });
+        }
+        employeeId = req.body.employeeId;
+      }
 
       // Check if user already exists
       const existingUser = await User.findOne({
@@ -59,6 +83,8 @@ router.post(
         role,
         department,
         phone,
+        projectId,
+        projectName,
       });
 
       await user.save();
@@ -69,6 +95,8 @@ router.post(
           id: user._id,
           email: user.email,
           role: user.role,
+          projectId: user.projectId,
+          projectName: user.projectName,
         },
         process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRE || "7d" }
@@ -84,6 +112,8 @@ router.post(
           employeeId: user.employeeId,
           role: user.role,
           department: user.department,
+          projectId: user.projectId,
+          projectName: user.projectName,
         },
       });
     } catch (error) {
@@ -138,6 +168,8 @@ router.post(
           id: user._id,
           employeeId: user.employeeId,
           role: user.role,
+          projectId: user.projectId,
+          projectName: user.projectName,
         },
         process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRE || "7d" }
@@ -154,6 +186,8 @@ router.post(
           role: user.role,
           department: user.department,
           lastLogin: user.lastLogin,
+          projectId: user.projectId,
+          projectName: user.projectName,
         },
       });
     } catch (error) {
