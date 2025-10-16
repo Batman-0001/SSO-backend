@@ -20,7 +20,7 @@ router.post(
     body("employeeId").notEmpty().withMessage("Employee ID is required"),
     body("role")
       .optional()
-      .isIn(["admin", "manager", "supervisor", "employee", "contractor"]),
+      .isIn(["sso", "hom", "tom"]),
   ],
   async (req, res) => {
     try {
@@ -99,7 +99,7 @@ router.post(
 router.post(
   "/login",
   [
-    body("email").isEmail().withMessage("Valid email is required"),
+    body("employeeId").notEmpty().withMessage("Employee ID is required"),
     body("password").notEmpty().withMessage("Password is required"),
   ],
   async (req, res) => {
@@ -109,10 +109,10 @@ router.post(
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { email, password } = req.body;
+      const { employeeId, password } = req.body;
 
-      // Find user by email
-      const user = await User.findOne({ email }).select("+password");
+      // Find user by employeeId
+      const user = await User.findOne({ employeeId }).select("+password");
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
@@ -136,7 +136,7 @@ router.post(
       const token = jwt.sign(
         {
           id: user._id,
-          email: user.email,
+          employeeId: user.employeeId,
           role: user.role,
         },
         process.env.JWT_SECRET,
