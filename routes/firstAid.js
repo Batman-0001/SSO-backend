@@ -25,15 +25,28 @@ router.post(
         .optional()
         .notEmpty()
         .withMessage("Victim employee ID is required"),
-      body("injuryType")
+      body("victimContractor")
         .optional()
         .notEmpty()
-        .withMessage("Injury type is required"),
+        .withMessage("Victim contractor is required"),
+      body("injuryLocation")
+        .optional()
+        .notEmpty()
+        .withMessage("Injury location is required"),
+      body("injuryDescription")
+        .optional()
+        .notEmpty()
+        .withMessage("Injury description is required"),
+      body("severity")
+        .optional()
+        .isIn(["minor", "serious", "critical"])
+        .withMessage("Severity must be minor, serious, or critical"),
       body("cause").optional().notEmpty().withMessage("Cause is required"),
-      body("treatmentGiven")
+      body("treatment").optional().notEmpty().withMessage("Treatment is required"),
+      body("treatedBy")
         .optional()
         .notEmpty()
-        .withMessage("Treatment given is required"),
+        .withMessage("Treated by is required"),
       body("transportToHospital")
         .optional()
         .isBoolean()
@@ -68,9 +81,14 @@ router.post(
         dateTime,
         victimName,
         victimEmpId,
+        victimContractor = "",
         injuryType,
-        cause,
-        treatmentGiven,
+        injuryLocation = "",
+        injuryDescription = "",
+        severity = "minor",
+        cause = injuryDescription, // Map injuryDescription to cause
+        treatment: treatmentGiven = "", // Map treatment to treatmentGiven
+        treatedBy = "",
         transportToHospital = false,
         hospitalName = "",
         hospitalDetails = "",
@@ -110,9 +128,14 @@ router.post(
         dateTime: new Date(dateTime),
         victimName: victimName || "",
         victimEmpId: victimEmpId || "",
+        victimContractor,
         injuryType: injuryType || "",
+        injuryLocation,
+        injuryDescription,
+        severity,
         cause: cause || "",
         treatmentGiven: treatmentGiven || "",
+        treatedBy,
         transportToHospital,
         hospitalName,
         hospitalDetails,
@@ -164,9 +187,14 @@ router.post(
         dateTime,
         victimName = "",
         victimEmpId = "",
+        victimContractor = "",
         injuryType = "",
-        cause = "",
-        treatmentGiven = "",
+        injuryLocation = "",
+        injuryDescription = "",
+        severity = "minor",
+        cause = injuryDescription, // Map injuryDescription to cause
+        treatment: treatmentGiven = "", // Map treatment to treatmentGiven
+        treatedBy = "",
         transportToHospital = false,
         hospitalName = "",
         hospitalDetails = "",
@@ -184,9 +212,14 @@ router.post(
         dateTime: new Date(dateTime),
         victimName,
         victimEmpId,
+        victimContractor,
         injuryType,
+        injuryLocation,
+        injuryDescription,
+        severity,
         cause,
         treatmentGiven,
+        treatedBy,
         transportToHospital,
         hospitalName,
         hospitalDetails,
@@ -318,9 +351,14 @@ router.put(
 
       const {
         status,
-        injuryType,
+        victimContractor,
+        injuryLocation,
+        injuryDescription,
+        severity,
         cause,
-        treatmentGiven,
+        treatment: treatmentGiven, // Map treatment to treatmentGiven
+        treatedBy,
+        injuryType,
         transportToHospital,
         hospitalName,
         hospitalDetails,
@@ -337,9 +375,14 @@ router.put(
       }
 
       // Update fields
+      if (victimContractor !== undefined) firstAid.victimContractor = victimContractor;
+      if (injuryLocation !== undefined) firstAid.injuryLocation = injuryLocation;
+      if (injuryDescription !== undefined) firstAid.injuryDescription = injuryDescription;
+      if (severity) firstAid.severity = severity;
+      if (cause !== undefined) firstAid.cause = cause;
+      if (treatmentGiven !== undefined) firstAid.treatmentGiven = treatmentGiven;
+      if (treatedBy !== undefined) firstAid.treatedBy = treatedBy;
       if (injuryType) firstAid.injuryType = injuryType;
-      if (cause) firstAid.cause = cause;
-      if (treatmentGiven) firstAid.treatmentGiven = treatmentGiven;
       if (transportToHospital !== undefined)
         firstAid.transportToHospital = transportToHospital;
       if (hospitalName) firstAid.hospitalName = hospitalName;

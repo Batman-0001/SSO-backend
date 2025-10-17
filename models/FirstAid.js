@@ -26,20 +26,45 @@ const firstAidSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    victimContractor: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     injuryType: {
       type: String,
       required: true,
       trim: true,
     },
+    injuryLocation: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    injuryDescription: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    severity: {
+      type: String,
+      enum: ["minor", "serious", "critical"],
+      default: "minor",
+    },
     cause: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
     },
     treatmentGiven: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
+    },
+    treatedBy: {
+      type: String,
+      trim: true,
+      default: "",
     },
     transportToHospital: {
       type: Boolean,
