@@ -38,7 +38,6 @@ router.post(
       body("immediateActions")
         .notEmpty()
         .withMessage("Immediate actions are required"),
-      body("sicSignature").notEmpty().withMessage("SIC signature is required"),
       body("photos")
         .optional()
         .isArray()
@@ -63,7 +62,6 @@ router.post(
         duration = "",
         immediateActions,
         photos = [],
-        sicSignature,
         status = "active",
       } = req.body;
 
@@ -78,7 +76,6 @@ router.post(
         duration,
         immediateActions,
         photos,
-        sicSignature,
         status,
         createdBy: req.user.id,
       });
@@ -155,7 +152,6 @@ router.post(
         duration = "",
         immediateActions,
         photos = [],
-        sicSignature = "",
       } = req.body;
 
       const stopWorkOrder = new StopWorkOrder({
@@ -169,7 +165,6 @@ router.post(
         duration,
         immediateActions,
         photos,
-        sicSignature,
         status: "draft",
         createdBy: req.user.id,
       });

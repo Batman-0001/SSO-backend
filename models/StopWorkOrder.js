@@ -63,12 +63,6 @@ const stopWorkOrderSchema = new mongoose.Schema(
         type: String, // Cloudinary URLs
       },
     ],
-    sicSignature: {
-      type: String, // Base64 signature or Cloudinary URL
-      required: function () {
-        return this.status !== "draft";
-      },
-    },
     status: {
       type: String,
       enum: ["draft", "active", "resolved", "cancelled"],
@@ -155,14 +149,6 @@ stopWorkOrderSchema.methods.cancel = function (reason = "") {
 
 // Pre-save validation
 stopWorkOrderSchema.pre("save", function (next) {
-  // Validate that SWO has required signature only for non-draft status
-  if (
-    this.status !== "draft" &&
-    (!this.sicSignature || this.sicSignature.trim().length === 0)
-  ) {
-    return next(new Error("SIC signature is required for Stop Work Order"));
-  }
-
   // Validate resolution data if status is resolved
   if (this.status === "resolved" && !this.resolvedBy) {
     return next(
