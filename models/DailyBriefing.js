@@ -9,6 +9,11 @@ const dailyBriefingSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    projectId: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     dateTime: {
       type: Date,
       required: true,
@@ -74,31 +79,8 @@ const dailyBriefingSchema = new mongoose.Schema(
     attendanceMethod: {
       type: String,
       required: true,
-      enum: ["digital", "photo", "manual"],
+      enum: ["photo", "manual"],
     },
-
-    // Digital Signatures (for attendanceMethod: 'digital')
-    digitalSignatures: [
-      {
-        name: {
-          type: String,
-          required: function () {
-            return this.parent().attendanceMethod === "digital";
-          },
-          trim: true,
-        },
-        signature: {
-          type: String, // Base64 encoded signature
-          required: function () {
-            return this.parent().attendanceMethod === "digital";
-          },
-        },
-        timestamp: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
 
     // Attendance Photos (for attendanceMethod: 'photo')
     attendancePhotos: [
@@ -192,6 +174,7 @@ const dailyBriefingSchema = new mongoose.Schema(
 
 // Indexes for better query performance
 dailyBriefingSchema.index({ talkNumber: 1 });
+dailyBriefingSchema.index({ projectId: 1, dateTime: -1 });
 dailyBriefingSchema.index({ dateTime: -1 });
 dailyBriefingSchema.index({ location: 1 });
 dailyBriefingSchema.index({ topicCategory: 1 });
@@ -228,8 +211,6 @@ dailyBriefingSchema.methods.getValidKeyPoints = function () {
 // Method to validate attendance based on method
 dailyBriefingSchema.methods.validateAttendance = function () {
   switch (this.attendanceMethod) {
-    case "digital":
-      return this.digitalSignatures && this.digitalSignatures.length > 0;
     case "photo":
       return this.attendancePhotos && this.attendancePhotos.length > 0;
     case "manual":

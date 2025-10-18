@@ -13,6 +13,7 @@ router.post(
   [
     auth,
     [
+      body("projectId").notEmpty().withMessage("Project ID is required"),
       body("talkNumber").notEmpty().withMessage("Talk number is required"),
       body("dateTime")
         .isISO8601()
@@ -29,7 +30,7 @@ router.post(
         .isInt({ min: 1 })
         .withMessage("Attendees count must be at least 1"),
       body("attendanceMethod")
-        .isIn(["digital", "photo", "manual"])
+        .isIn(["photo", "manual"])
         .withMessage("Valid attendance method is required"),
       body("keyPoints")
         .isArray({ min: 1 })
@@ -49,6 +50,7 @@ router.post(
       }
 
       const {
+        projectId,
         talkNumber,
         dateTime,
         location,
@@ -58,7 +60,6 @@ router.post(
         customTopic,
         attendeesCount,
         attendanceMethod,
-        digitalSignatures,
         attendancePhotos,
         attendeesList,
         keyPoints,
@@ -70,16 +71,6 @@ router.post(
       } = req.body;
 
       // Validate attendance method specific data
-      if (
-        attendanceMethod === "digital" &&
-        (!digitalSignatures || digitalSignatures.length === 0)
-      ) {
-        return res.status(400).json({
-          message:
-            "Digital signatures are required when attendance method is digital",
-        });
-      }
-
       if (
         attendanceMethod === "photo" &&
         (!attendancePhotos || attendancePhotos.length === 0)
@@ -112,6 +103,7 @@ router.post(
       }
 
       const dailyBriefing = new DailyBriefing({
+        projectId,
         talkNumber,
         dateTime: new Date(dateTime),
         location,
@@ -121,8 +113,6 @@ router.post(
         customTopic: topicCategory === "Custom Topic" ? customTopic : undefined,
         attendeesCount,
         attendanceMethod,
-        digitalSignatures:
-          attendanceMethod === "digital" ? digitalSignatures : undefined,
         attendancePhotos:
           attendanceMethod === "photo" ? attendancePhotos : undefined,
         attendeesList:
@@ -165,6 +155,7 @@ router.get("/", auth, async (req, res) => {
     const {
       page = 1,
       limit = 10,
+      projectId,
       location,
       topicCategory,
       conductedBy,
@@ -178,6 +169,7 @@ router.get("/", auth, async (req, res) => {
 
     const filter = {};
 
+    if (projectId) filter.projectId = projectId;
     if (location) filter.location = new RegExp(location, "i");
     if (topicCategory) filter.topicCategory = topicCategory;
     if (conductedBy) filter.conductedBy = new RegExp(conductedBy, "i");
@@ -407,8 +399,10 @@ router.post("/generate-talk-number", auth, async (req, res) => {
 // @access  Private
 router.get("/stats/overview", auth, async (req, res) => {
   try {
-    const { dateFrom, dateTo } = req.query;
+    const { dateFrom, dateTo, projectId } = req.query;
     const filter = {};
+
+    if (projectId) filter.projectId = projectId;
 
     // Date range filter
     if (dateFrom || dateTo) {
@@ -518,11 +512,6 @@ router.get("/topics/categories", auth, async (req, res) => {
 router.get("/attendance/methods", auth, async (req, res) => {
   try {
     const attendanceMethods = [
-      {
-        value: "digital",
-        label: "Digital Signatures (Capture on mobile)",
-        description: "Capture digital signatures from attendees",
-      },
       {
         value: "photo",
         label: "Photo Upload (Group photo with workers)",
