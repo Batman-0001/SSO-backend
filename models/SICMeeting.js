@@ -34,9 +34,6 @@ const sicMeetingSchema = new mongoose.Schema(
         },
         contractor: {
           type: String,
-          required: function () {
-            return this.status !== "draft";
-          },
           trim: true,
         },
       },
@@ -256,9 +253,9 @@ sicMeetingSchema.pre("save", function (next) {
   // Validate attendees
   if (this.attendees && this.attendees.length > 0) {
     this.attendees.forEach((attendee, index) => {
-      if (!attendee.name || !attendee.empId || !attendee.contractor) {
+      if (!attendee.name || !attendee.empId) {
         return next(
-          new Error(`Attendee ${index + 1} is missing required fields`)
+          new Error(`Attendee ${index + 1} is missing required fields (name and empId)`)
         );
       }
     });
