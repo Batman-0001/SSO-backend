@@ -48,7 +48,7 @@ const firstAidSchema = new mongoose.Schema(
     },
     severity: {
       type: String,
-      enum: ["minor", "serious", "critical"],
+      enum: ["minor","moderate", "serious", "critical"],
       default: "minor",
     },
     cause: {

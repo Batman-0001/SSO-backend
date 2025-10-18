@@ -39,7 +39,7 @@ router.post(
         .withMessage("Injury description is required"),
       body("severity")
         .optional()
-        .isIn(["minor", "serious", "critical"])
+        .isIn(["minor","moderate","serious", "critical"])
         .withMessage("Severity must be minor, serious, or critical"),
       body("cause").optional().notEmpty().withMessage("Cause is required"),
       body("treatment").optional().notEmpty().withMessage("Treatment is required"),
@@ -53,8 +53,20 @@ router.post(
         .withMessage("Transport to hospital must be a boolean"),
       body("hospitalName")
         .optional()
-        .notEmpty()
-        .withMessage("Hospital name is required if victim was transported"),
+        .custom((value, { req }) => {
+          if (req.body.transportToHospital && (!value || value.trim().length === 0)) {
+            throw new Error("Hospital name is required when victim was transported to hospital");
+          }
+          return true;
+        }),
+      body("hospitalDetails")
+        .optional()
+        .custom((value, { req }) => {
+          if (req.body.transportToHospital && (!value || value.trim().length === 0)) {
+            throw new Error("Hospital details are required when victim was transported to hospital");
+          }
+          return true;
+        }),
       body("witnessNames")
         .optional()
         .isArray()
@@ -104,18 +116,6 @@ router.post(
         (victimName && victimEmpId && injuryType && cause && treatmentGiven)
       ) {
         finalStatus = "reported";
-      }
-
-      // Validate hospital transport requirements for reported cases
-      if (
-        finalStatus === "reported" &&
-        transportToHospital &&
-        (!hospitalName || hospitalName.trim().length === 0)
-      ) {
-        return res.status(400).json({
-          message:
-            "Hospital name is required when victim was transported to hospital",
-        });
       }
 
       // Filter out empty witness names
@@ -330,8 +330,20 @@ router.put(
         .withMessage("Transport to hospital must be a boolean"),
       body("hospitalName")
         .optional()
-        .notEmpty()
-        .withMessage("Hospital name is required if victim was transported"),
+        .custom((value, { req }) => {
+          if (req.body.transportToHospital && (!value || value.trim().length === 0)) {
+            throw new Error("Hospital name is required when victim was transported to hospital");
+          }
+          return true;
+        }),
+      body("hospitalDetails")
+        .optional()
+        .custom((value, { req }) => {
+          if (req.body.transportToHospital && (!value || value.trim().length === 0)) {
+            throw new Error("Hospital details are required when victim was transported to hospital");
+          }
+          return true;
+        }),
       body("followUpRequired")
         .optional()
         .isBoolean()
@@ -411,17 +423,6 @@ router.put(
         if (followUpRequired && followUpDate) {
           firstAid.scheduleFollowUp(followUpDate, followUpNotes || "");
         }
-      }
-
-      // Validate hospital transport requirements
-      if (
-        firstAid.transportToHospital &&
-        (!firstAid.hospitalName || firstAid.hospitalName.trim().length === 0)
-      ) {
-        return res.status(400).json({
-          message:
-            "Hospital name is required when victim was transported to hospital",
-        });
       }
 
       firstAid.updatedBy = req.user.id;
