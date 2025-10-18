@@ -97,7 +97,7 @@ const incidentReportSchema = new mongoose.Schema(
     personCompany: {
       type: String,
       trim: true,
-      enum: ["MEIL", "Subcontractor", "Visitor", ""],
+      enum: ["MEIL", "Subcontractor", "Visitor", "Contractor", "Supplier", "Other", ""],
       default: "",
     },
     injuryDetails: {
