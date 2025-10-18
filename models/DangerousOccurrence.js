@@ -36,11 +36,6 @@ const dangerousOccurrenceSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    reportedBy: {
-      type: String,
-      required: true,
-      trim: true,
-    },
     investigationRequired: {
       type: Boolean,
       default: false,
@@ -267,8 +262,7 @@ dangerousOccurrenceSchema.pre("save", function (next) {
       !this.location ||
       !this.situation ||
       !this.potentialConsequence ||
-      !this.preventiveActions ||
-      !this.reportedBy
+      !this.preventiveActions
     ) {
       return next(
         new Error("All required fields must be filled for submitted reports")

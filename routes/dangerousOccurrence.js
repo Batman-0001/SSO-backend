@@ -33,10 +33,6 @@ router.post(
         .optional()
         .notEmpty()
         .withMessage("Preventive actions are required"),
-      body("reportedBy")
-        .optional()
-        .notEmpty()
-        .withMessage("Reported by is required"),
       body("investigationRequired")
         .optional()
         .isBoolean()
@@ -69,7 +65,6 @@ router.post(
         situation,
         potentialConsequence,
         preventiveActions,
-        reportedBy,
         investigationRequired = false,
         severity = "high",
         photos = [],
@@ -83,8 +78,7 @@ router.post(
         (location &&
           situation &&
           potentialConsequence &&
-          preventiveActions &&
-          reportedBy)
+          preventiveActions)
       ) {
         finalStatus = "reported";
       }
@@ -96,7 +90,6 @@ router.post(
         situation: situation || "",
         potentialConsequence: potentialConsequence || "",
         preventiveActions: preventiveActions || "",
-        reportedBy: reportedBy || "",
         investigationRequired,
         severity,
         photos,
@@ -156,7 +149,6 @@ router.post(
         situation = "",
         potentialConsequence = "",
         preventiveActions = "",
-        reportedBy = "",
         investigationRequired = false,
         severity = "high",
         photos = [],
@@ -169,7 +161,6 @@ router.post(
         situation,
         potentialConsequence,
         preventiveActions,
-        reportedBy,
         investigationRequired,
         severity,
         photos,
