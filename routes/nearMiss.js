@@ -53,10 +53,16 @@ router.post(
   ],
   async (req, res) => {
     try {
+      console.log('NearMiss POST request body:', JSON.stringify(req.body, null, 2));
+      console.log('NearMiss POST user:', req.user ? { id: req.user.id, role: req.user.role } : 'No user');
+
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.log('NearMiss POST validation errors:', JSON.stringify(errors.array(), null, 2));
         return res.status(400).json({ errors: errors.array() });
       }
+
+      console.log('NearMiss POST validation passed');
 
       const {
         projectId,
@@ -100,6 +106,8 @@ router.post(
 
       await nearMiss.save();
 
+      console.log('NearMiss POST save successful, ID:', nearMiss._id);
+
       res.status(201).json({
         message:
           finalStatus === "draft"
@@ -109,6 +117,11 @@ router.post(
       });
     } catch (error) {
       console.error("Error creating near miss report:", error);
+      console.error("NearMiss POST error details:", {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -130,10 +143,16 @@ router.post(
   ],
   async (req, res) => {
     try {
+      console.log('NearMiss SAVE-DRAFT request body:', JSON.stringify(req.body, null, 2));
+      console.log('NearMiss SAVE-DRAFT user:', req.user ? { id: req.user.id, role: req.user.role } : 'No user');
+
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.log('NearMiss SAVE-DRAFT validation errors:', JSON.stringify(errors.array(), null, 2));
         return res.status(400).json({ errors: errors.array() });
       }
+
+      console.log('NearMiss SAVE-DRAFT validation passed');
 
       const {
         projectId,
@@ -163,12 +182,19 @@ router.post(
 
       await nearMiss.save();
 
+      console.log('NearMiss SAVE-DRAFT save successful, ID:', nearMiss._id);
+
       res.status(201).json({
         message: "Draft saved successfully",
         data: nearMiss,
       });
     } catch (error) {
       console.error("Error saving near miss draft:", error);
+      console.error("NearMiss SAVE-DRAFT error details:", {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -262,10 +288,17 @@ router.put(
   ],
   async (req, res) => {
     try {
+      console.log('NearMiss PUT request body:', JSON.stringify(req.body, null, 2));
+      console.log('NearMiss PUT params:', req.params);
+      console.log('NearMiss PUT user:', req.user ? { id: req.user.id, role: req.user.role } : 'No user');
+
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.log('NearMiss PUT validation errors:', JSON.stringify(errors.array(), null, 2));
         return res.status(400).json({ errors: errors.array() });
       }
+
+      console.log('NearMiss PUT validation passed');
 
       const {
         status,
@@ -342,12 +375,19 @@ router.put(
 
       await nearMiss.save();
 
+      console.log('NearMiss PUT save successful, ID:', nearMiss._id);
+
       res.json({
         message: "Near miss report updated successfully",
         data: nearMiss,
       });
     } catch (error) {
       console.error("Error updating near miss report:", error);
+      console.error("NearMiss PUT error details:", {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }

@@ -18,28 +18,28 @@ const nearMissSchema = new mongoose.Schema(
     },
     location: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
     },
     situation: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
     },
     potentialConsequence: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
     },
     preventiveActions: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
     },
     reportedBy: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
     },
     photos: [
       {
@@ -169,6 +169,16 @@ nearMissSchema.methods.shareWithTeam = function () {
 
 // Pre-save validation
 nearMissSchema.pre("save", function (next) {
+  console.log('NearMiss pre-save hook triggered for ID:', this._id || 'new document');
+  console.log('NearMiss pre-save status:', this.status);
+  console.log('NearMiss pre-save data:', {
+    location: this.location,
+    situation: this.situation,
+    potentialConsequence: this.potentialConsequence,
+    preventiveActions: this.preventiveActions,
+    reportedBy: this.reportedBy
+  });
+
   // Only validate required fields for non-draft status
   if (this.status !== "draft") {
     // Validate required fields for submitted reports
@@ -179,11 +189,14 @@ nearMissSchema.pre("save", function (next) {
       !this.preventiveActions ||
       !this.reportedBy
     ) {
+      console.log('NearMiss pre-save validation failed: missing required fields');
       return next(
         new Error("All required fields must be filled for submitted reports")
       );
     }
   }
+
+  console.log('NearMiss pre-save validation passed');
 
   // Validate action deadline if action is assigned
   if (this.status === "action_taken" && !this.actionDeadline) {
@@ -202,6 +215,7 @@ nearMissSchema.pre("save", function (next) {
     this.status = "closed";
   }
 
+  console.log('NearMiss pre-save hook completed successfully');
   next();
 });
 
